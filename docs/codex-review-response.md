@@ -21,6 +21,18 @@ SoC, cycle cap). It is reported strictly as an **upper bound — no capture-% fu
 Data sanity: 8,784 hourly prices, 0 nulls, range −135.4…+936.3 €/MWh, 457 negative-price
 hours, 366 Berlin days (histogram 23/24/25 h → DST handled), `max simultaneous c&d = 0`.
 
+**Multi-year robustness (2023–2025, same corrected LP; 2025 includes 15-min post-go-live days):**
+
+| year | ceiling @1.5 cyc | cyc/day | gross | uncapped | neg-price intervals |
+|---|---|---|---|---|---|
+| 2023 | €61.1/MWh | 1.35 | €5,403 | €55.0/MWh | 301 |
+| 2024 | €68.3/MWh | 1.37 | €6,148 | €61.7/MWh | 457 |
+| 2025 | €77.3/MWh | 1.38 | €7,030 | €68.2/MWh | 724 |
+
+Not a one-year fluke: the perfect-foresight **ceiling is €61–77/MWh every year, always below €80**,
+gross €5.4–7.0k vs assumed €9,947. Spreads are **widening** (€61→€77, 2023→2025) — a favourable
+trend. Realistic causal capture (~85% of ceiling) ≈ €52 / €58 / €66 per MWh. `simul = 0` all years.
+
 **Conclusion:** the arbitrage assumption is optimistic. Even a perfect-foresight ceiling is
 ~15% below €80/MWh; realistic causal capture (~85% of foresight) ≈ **€55–61/MWh**, gross
 ≈ **€5,200–5,400/yr** from day-ahead arbitrage alone. **Re-base the deck on ~€60/MWh**, show

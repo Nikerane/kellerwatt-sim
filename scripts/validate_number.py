@@ -1,24 +1,26 @@
 #!/usr/bin/env python3
-"""Validate the core number — throwaway spike (Codex review #18).
+"""Validate the core number across years — throwaway spike (Codex review #18).
 
-Downloads real DE-LU 2024 day-ahead prices (Energy-Charts, no token), runs a
-*corrected* perfect-day-ahead-foresight LP, and prints the implied captured
-spread (EUR/MWh) and cycles/day to compare against the business-plan assumption
-of ~EUR 80/MWh at 1.5 cycles/day.
+Downloads real DE-LU day-ahead prices (Energy-Charts, no token) for each given
+year, runs a *corrected* perfect-day-ahead-foresight LP, and prints the implied
+captured spread (EUR/MWh) and cycles/day vs the business-plan assumption of
+~EUR 80/MWh at 1.5 cycles/day.
+
+    python scripts/validate_number.py 2023 2024 2025
 
 Corrections baked in vs the original plan:
-  #1  no simultaneous charge/discharge (a strictly-positive throughput penalty
-      makes it unprofitable; we ALSO assert it never happens).
-  #2  delivery days grouped by Europe/Berlin local date (not UTC), so DST
-      23h/25h days are handled correctly.
-  #15 data completeness is validated and reported, not silently dropped.
-  #3  the LP is reported strictly as a perfect-foresight UPPER BOUND — no
-      capture-% fudge factor anywhere.
+  #1  no simultaneous charge/discharge (binary mutual-exclusion; asserted == 0).
+  #2  delivery days grouped by Europe/Berlin local date (DST 23h/25h handled).
+  #15 data completeness validated/reported; incomplete days skipped.
+  #3  LP reported strictly as a perfect-foresight UPPER BOUND -- no capture-% fudge.
+Handles mixed resolution: hourly before 2025-10-01, 15-min after (dt_h inferred per day).
 
 Stdlib only except PuLP (+ optional highspy). Python 3.9+.
 """
 import json
 import math
+import statistics
+import sys
 import urllib.request
 from collections import defaultdict
 from datetime import datetime, timezone
@@ -33,24 +35,21 @@ SOC_MIN = 0.10 * CAP_KWH          # 20 kWh
 SOC_MAX = 1.00 * CAP_KWH          # 200 kWh
 E_USABLE = SOC_MAX - SOC_MIN      # 180 kWh
 ETA = math.sqrt(0.90)             # one-way; RTE applied ONCE in the SoC balance
-LAMBDA_EUR_MWH = 1.0              # tiny throughput tie-break -> kills simultaneity
+LAMBDA_EUR_MWH = 1.0              # tiny throughput tie-break
 BERLIN = ZoneInfo("Europe/Berlin")
 
-URL = "https://api.energy-charts.info/price?bzn=DE-LU&start=2024-01-01&end=2024-12-31"
 
-
-def fetch_prices():
-    with urllib.request.urlopen(URL, timeout=120) as r:
+def fetch_prices(year):
+    url = (f"https://api.energy-charts.info/price?bzn=DE-LU"
+           f"&start={year}-01-01&end={year}-12-31")
+    with urllib.request.urlopen(url, timeout=120) as r:
         payload = json.load(r)
-    secs, price = payload["unix_seconds"], payload["price"]
-    rows = []
-    dropped = 0
-    for s, p in zip(secs, price):
+    rows, dropped = [], 0
+    for s, p in zip(payload["unix_seconds"], payload["price"]):
         if p is None:
             dropped += 1
             continue
-        utc = datetime.fromtimestamp(s, tz=timezone.utc)
-        rows.append((utc, float(p)))
+        rows.append((datetime.fromtimestamp(s, tz=timezone.utc), float(p)))
     rows.sort(key=lambda x: x[0])
     return rows, dropped
 
@@ -63,6 +62,14 @@ def group_by_berlin_day(rows):
     for d in days:
         days[d].sort(key=lambda x: x[0])
     return days
+
+
+def infer_dt_h(pts):
+    if len(pts) < 2:
+        return 1.0
+    diffs = [(pts[i + 1][0] - pts[i][0]).total_seconds() / 3600.0
+             for i in range(len(pts) - 1)]
+    return statistics.median(diffs)
 
 
 def solve_day(prices, dt_h, cycles_cap):
@@ -84,7 +91,7 @@ def solve_day(prices, dt_h, cycles_cap):
         prob += soc[t] == prev + (ETA * c[t] - d[t] / ETA) * dt_h
         prob += c[t] <= POWER_KW * y[t]            # #1: no simultaneous
         prob += d[t] <= POWER_KW * (1 - y[t])      #     charge & discharge
-    prob += soc[T - 1] == soc0  # cyclic: end where we began
+    prob += soc[T - 1] == soc0                     # cyclic
     if cycles_cap is not None:
         prob += pulp.lpSum(d[t] * dt_h for t in range(T)) <= cycles_cap * E_USABLE
 
@@ -95,66 +102,64 @@ def solve_day(prices, dt_h, cycles_cap):
     mwh_dis = sum(dv[t] * dt_h for t in range(T)) / 1000.0
     mwh_chg = sum(cv[t] * dt_h for t in range(T)) / 1000.0
     simul = max((min(cv[t], dv[t]) for t in range(T)), default=0.0)
-    neg_gross = sum((prices[t] / 1000.0) * (dv[t] - cv[t]) * dt_h
-                    for t in range(T) if prices[t] < 0)
-    return gross, mwh_dis, mwh_chg, simul, neg_gross
+    return gross, mwh_dis, mwh_chg, simul
 
 
 def run(days, cycles_cap, label):
-    tot_gross = tot_dis = tot_chg = tot_neg = 0.0
+    tot_gross = tot_dis = tot_chg = 0.0
     max_simul = 0.0
     n = 0
     for d in sorted(days):
         pts = days[d]
-        if len(pts) < 20:          # incomplete day (allow 23 for DST)
+        dt_h = infer_dt_h(pts)
+        if not (22 <= len(pts) * dt_h <= 26):   # skip incomplete days (allow DST 23/25h)
             continue
-        prices = [p for _, p in pts]
-        dt_h = 1.0                  # 2024 DE-LU is hourly
-        g, md, mc, sm, ng = solve_day(prices, dt_h, cycles_cap)
-        tot_gross += g; tot_dis += md; tot_chg += mc; tot_neg += ng
+        g, md, mc, sm = solve_day([p for _, p in pts], dt_h, cycles_cap)
+        tot_gross += g; tot_dis += md; tot_chg += mc
         max_simul = max(max_simul, sm)
         n += 1
     spread = tot_gross / tot_dis if tot_dis else 0.0
     cyc = (tot_dis * 1000.0) / (E_USABLE * n) if n else 0.0
-    print(f"\n=== {label} ===")
-    print(f"days simulated         : {n}")
-    print(f"total gross (EUR)      : {tot_gross:,.0f}")
-    print(f"MWh discharged (AC)    : {tot_dis:,.1f}")
-    print(f"MWh charged (AC)       : {tot_chg:,.1f}")
-    print(f"IMPLIED SPREAD EUR/MWh : {spread:,.1f}   (assumed 80)")
-    print(f"IMPLIED CYCLES/DAY     : {cyc:,.2f}   (assumed 1.5)")
-    print(f"gross during neg-price : {tot_neg:,.0f} EUR "
-          f"({100*tot_neg/tot_gross if tot_gross else 0:.0f}% of gross)")
-    print(f"max simultaneous c&d   : {max_simul:.4f} kW  (must be ~0)")
-    return spread, cyc
+    print(f"  {label:<34} spread {spread:5.1f} EUR/MWh | {cyc:4.2f} cyc/day "
+          f"| gross {tot_gross:7,.0f} | simul {max_simul:.3f}")
+    return spread, cyc, tot_gross, n
 
 
 def main():
     global SOLVER
     try:
         SOLVER = pulp.HiGHS(msg=False)
-        solver_name = "HiGHS"
+        sname = "HiGHS"
     except Exception:
         SOLVER = pulp.PULP_CBC_CMD(msg=False)
-        solver_name = "CBC"
-    print(f"solver: {solver_name}")
+        sname = "CBC"
+    years = [int(a) for a in sys.argv[1:]] or [2024]
+    print(f"solver: {sname}   years: {years}")
 
-    rows, dropped = fetch_prices()
-    days = group_by_berlin_day(rows)
-    hour_counts = defaultdict(int)
-    for d in days:
-        hour_counts[len(days[d])] += 1
-    print(f"fetched {len(rows)} hourly prices ({dropped} null dropped)")
-    print(f"Berlin delivery days   : {len(days)}")
-    print(f"hours-per-day histogram: {dict(sorted(hour_counts.items()))}")
-    print(f"price range EUR/MWh    : {min(p for _,p in rows):.1f} .. {max(p for _,p in rows):.1f}")
-    neg_hours = sum(1 for _, p in rows if p < 0)
-    print(f"negative-price hours   : {neg_hours}")
+    summary = []
+    for year in years:
+        rows, dropped = fetch_prices(year)
+        days = group_by_berlin_day(rows)
+        ppd = defaultdict(int)
+        for d in days:
+            ppd[len(days[d])] += 1
+        print(f"\n########## {year} ##########")
+        print(f"  {len(rows)} prices ({dropped} null), {len(days)} Berlin days, "
+              f"points/day {dict(sorted(ppd.items()))}")
+        print(f"  range {min(p for _,p in rows):.1f}..{max(p for _,p in rows):.1f} EUR/MWh, "
+              f"{sum(1 for _, p in rows if p < 0)} neg-price intervals")
+        s15, c15, g15, _ = run(days, 1.5, "ceiling, capped 1.5 cyc")
+        s0, c0, g0, _ = run(days, None, "ceiling, uncapped")
+        summary.append((year, s15, c15, g15, s0, c0, g0))
 
-    run(days, 1.5, "PERFECT-FORESIGHT CEILING, capped at 1.5 cycles/day")
-    run(days, None, "PERFECT-FORESIGHT CEILING, uncapped (natural cycling)")
-    print("\nNote: the LP has PERFECT day-ahead foresight -> this is an UPPER BOUND.")
-    print("Real causal operation (forecast error) lands below this. No capture-% fudge applied.")
+    print("\n===== MULTI-YEAR SUMMARY — perfect-foresight UPPER BOUND (no fudge) =====")
+    print("assumed: 80.0 EUR/MWh @ 1.50 cyc/day, ~EUR 9,947 gross/yr")
+    print(f"{'year':>5} | {'capped@1.5  EUR/MWh   cyc    gross':>34} | "
+          f"{'uncapped  EUR/MWh   cyc    gross':>32}")
+    for yr, s15, c15, g15, s0, c0, g0 in summary:
+        print(f"{yr:>5} | {s15:>14.1f} {c15:>6.2f} {g15:>9,.0f}  | "
+              f"{s0:>12.1f} {c0:>6.2f} {g0:>9,.0f}")
+    print("\nReal causal capture ~85% of this ceiling. Re-base the deck on the conservative end.")
 
 
 if __name__ == "__main__":
