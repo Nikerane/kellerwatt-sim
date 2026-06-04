@@ -33,9 +33,11 @@ _EPS = 1e-9
 
 @dataclass(frozen=True)
 class DayDispatch:
-    gross_eur: float          # pure AC arbitrage revenue of the solved dispatch
+    gross_eur: float          # pure AC arbitrage revenue (= sale - purchase turnover)
     mwh_discharged: float     # AC energy delivered
     mwh_charged: float        # AC energy drawn
+    sale_turnover_eur: float  # revenue from discharging (BKV sale-turnover basis)
+    purchase_turnover_eur: float  # cost of charging (signed)
     simul_max: float          # max simultaneous charge & discharge (must be ~0)
     status: str
     charge_kw: tuple
@@ -88,7 +90,9 @@ def solve_day_ceiling(
     cv = [c[t].value() or 0.0 for t in range(T)]
     dv = [d[t].value() or 0.0 for t in range(T)]
     socv = [soc[t].value() for t in range(T)]
-    gross = sum((prices[t] / 1000.0) * (dv[t] - cv[t]) * dt_h for t in range(T))
+    sale = sum((prices[t] / 1000.0) * dv[t] * dt_h for t in range(T))
+    purchase = sum((prices[t] / 1000.0) * cv[t] * dt_h for t in range(T))
+    gross = sale - purchase
     mwh_dis = sum(dv[t] * dt_h for t in range(T)) / 1000.0
     mwh_chg = sum(cv[t] * dt_h for t in range(T)) / 1000.0
     simul = max((min(cv[t], dv[t]) for t in range(T)), default=0.0)
@@ -96,6 +100,8 @@ def solve_day_ceiling(
         gross_eur=gross,
         mwh_discharged=mwh_dis,
         mwh_charged=mwh_chg,
+        sale_turnover_eur=sale,
+        purchase_turnover_eur=purchase,
         simul_max=simul,
         status="Optimal",
         charge_kw=tuple(cv),
@@ -121,6 +127,8 @@ class CausalDay:
     net_eur: float            # after marginal grid fee / degradation
     mwh_discharged: float
     mwh_charged: float
+    sale_turnover_eur: float
+    purchase_turnover_eur: float
     soc_start_kwh: float
     soc_end_kwh: float
     traded: bool
@@ -149,6 +157,14 @@ class CausalResult:
     @property
     def mwh_charged(self) -> float:
         return sum(d.mwh_charged for d in self.days)
+
+    @property
+    def sale_turnover_eur(self) -> float:
+        return sum(d.sale_turnover_eur for d in self.days)
+
+    @property
+    def purchase_turnover_eur(self) -> float:
+        return sum(d.purchase_turnover_eur for d in self.days)
 
     @property
     def implied_spread(self) -> float:
@@ -206,7 +222,7 @@ def run_causal_walkforward(
 
         soc_start = soc
         day_dis_ac = 0.0
-        g = net = mdis = mchg = 0.0
+        g = net = mdis = mchg = sale = purchase = 0.0
 
         for price in day.prices:
             # Charge on cheap intervals, only if a positive round-trip is expected
@@ -217,7 +233,9 @@ def run_causal_walkforward(
                 if c_kw > _EPS:
                     e_ac = c_kw * dt
                     soc += eta * c_kw * dt
-                    g -= (price / 1000.0) * e_ac
+                    cost = (price / 1000.0) * e_ac
+                    g -= cost
+                    purchase += cost
                     net -= ((price + grid_fee_charge) / 1000.0) * e_ac
                     mchg += e_ac / 1000.0
                     continue
@@ -229,14 +247,17 @@ def run_causal_walkforward(
                 if d_kw > _EPS:
                     e_ac = d_kw * dt
                     soc -= d_kw / eta * dt
-                    g += (price / 1000.0) * e_ac
+                    rev = (price / 1000.0) * e_ac
+                    g += rev
+                    sale += rev
                     net += ((price - degradation_discharge) / 1000.0) * e_ac
                     mdis += e_ac / 1000.0
                     day_dis_ac += e_ac
                     continue
             # else idle
 
-        results.append(CausalDay(day.day, g, net, mdis, mchg, soc_start, soc, traded))
+        results.append(CausalDay(day.day, g, net, mdis, mchg, sale, purchase,
+                                 soc_start, soc, traded))
 
     # Deterministic terminal restoration: value the net horizon energy change at a
     # causal reference (median of the last trailing window), discounted through eta,
