@@ -177,14 +177,22 @@ class CausalResult:
         return self.gross_eur / m if m else 0.0
 
     def per_year(self) -> dict:
-        """Aggregate gross/discharge/charge by calendar year of the delivery day."""
+        """Aggregate by calendar year of the delivery day. Excludes the single
+        horizon-end terminal restoration (immaterial; reported separately)."""
         agg: dict[int, dict] = {}
         for d in self.days:
-            y = agg.setdefault(d.day.year, {"gross": 0.0, "net": 0.0, "dis": 0.0, "chg": 0.0})
+            y = agg.setdefault(d.day.year, {
+                "gross": 0.0, "net": 0.0, "dis": 0.0, "chg": 0.0,
+                "sale": 0.0, "purchase": 0.0, "days": 0, "traded_days": 0,
+            })
             y["gross"] += d.gross_eur
             y["net"] += d.net_eur
             y["dis"] += d.mwh_discharged
             y["chg"] += d.mwh_charged
+            y["sale"] += d.sale_turnover_eur
+            y["purchase"] += d.purchase_turnover_eur
+            y["days"] += 1
+            y["traded_days"] += 1 if d.traded else 0
         return agg
 
 
