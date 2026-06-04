@@ -23,3 +23,7 @@ addopts = "-q"
 markers = [
     "network: test reaches the Energy-Charts API (deselect with -m 'not network')",
 ]
+filterwarnings = [
+    # PuLP 3.3.2 warns about the LpVariable ctor it still uses internally; pinned.
+    "ignore:Constructing LpVariable:DeprecationWarning",
+]
