@@ -4,6 +4,19 @@
 **Status:** Approved
 **Author:** KellerWatt founder + Claude
 
+> **Architecture update (2026-06-04) — supersedes Streamlit references below.**
+> Pivoted to one branded foundation. Python is now a **headless engine** (data_load +
+> dispatch LP/threshold + economics + metrics) that emits **`sim_results.json`**; all public
+> surfaces are **Vite + React + TypeScript** sharing the token foundation in
+> `app-package/assets/colors_and_type.css`. **Streamlit is retired** — ignore the Streamlit /
+> `app/streamlit_app.py` mentions in §3/§8/§12 and the plan's Streamlit tasks (T11–T12; replaced
+> by a `sim_results.json` export task + a separate web-foundation plan).
+> **JSON contract:** `{ meta, days:[{date,gross_eur,mwh_discharged,mwh_charged,neg_price_gross_eur}],
+> sample:{prices[],charge_kw[],discharge_kw[],soc_kwh[],dt_h}, metrics:{implied_spread_eur_mwh,
+> implied_cycles_day,year1_gross_eur,year1_ebitda_eur,payback_years,irr,neg_price_share},
+> conservative:{…same metrics…}, assumed:{spread_eur_mwh,cycles_day,gross_eur,ebitda_eur,irr,payback_yr} }`.
+> Chosen primitive stack: see `docs/brand/brand-guidelines.md` → **Foundation stack**.
+
 ## 1. Context
 
 KellerWatt installs 200 kWh LFP batteries in apartment-building basements, leases the

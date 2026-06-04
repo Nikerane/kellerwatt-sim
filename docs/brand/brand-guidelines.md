@@ -124,3 +124,22 @@ radii, shadows, motion easings) plus reusable visual atoms in `repos/app-package
 canonical foundation to adopt — not as one-off inspiration. See
 `docs/superpowers/specs/2026-06-04-kellerwatt-arbitrage-sim-design.md` for how the rigorous
 Python simulation feeds real numbers into these surfaces.
+
+## Foundation stack (chosen primitives)
+
+Stack: **Vite + React + TypeScript**, static deploy. One pick per category, chosen to be
+neutral/unopinionated so they bend to the brand rather than impose a look.
+
+| Category | Pick | Why / notes |
+|---|---|---|
+| Motion (web) | **Motion** (`motion`) | Easing token drops in: `ease:[0.2,0.7,0.2,1.0]`. `AnimatePresence` = cross-fades; idle sine drift via `useTime`/`useTransform`. Honors `useReducedMotion`. MIT. |
+| Motion (film) | **GSAP** timelines | Free incl. plugins. Choreographs the 7 scenes + camera push. Kept off the website (no scroll-jacking). |
+| Data-viz | **`d3-scale` + `d3-shape` + hand-rolled SVG** (opt. `@visx/*`) | Keep the bespoke `Ring`/`DayChart`. No chart library (Recharts/nivo/Tremor fight the look). `tabular-nums` for mono figures. |
+| Headless UI | **Radix UI** + **Vaul** (sheets) | Unstyled, accessible; painted to brand. Vaul = the payout bottom-sheet. |
+| Icons | **Lucide** (or Phosphor "thin") | Stroke-only — respects "no icons with fills". |
+| Texture | Inline SVG **`feTurbulence`** grain + `radial-gradient` vignette + hex `<pattern>` @6–7% | No JS for the static grain; Hearth sections only. |
+| Fonts | **Fontsource** self-host (`@fontsource-variable/fraunces`, `…/inter`, `@fontsource/jetbrains-mono`) | Not the Google CDN — Fraunces `opsz` via `font-optical-sizing:auto`; GDPR-safer for a German brand. |
+
+**Reference sites to study** (unverified — confirm visually): Stripe Press, Octopus Energy,
+Tibber, Patagonia, Basecamp/37signals writing, GOV.UK (restraint), Geist/Vercel (mono+sans).
+
