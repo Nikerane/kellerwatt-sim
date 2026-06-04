@@ -1,0 +1,25 @@
+[project]
+name = "kellerwatt-engine"
+version = "0.1.0"
+description = "KellerWatt arbitrage simulation engine — perfect-foresight ceiling + causal walk-forward benchmark over real DE-LU day-ahead prices."
+requires-python = ">=3.10"
+# Pinned to the versions resolved into .venv (the solver MUST be deterministic).
+dependencies = [
+    "pulp==3.3.2",
+    "highspy==1.14.0",
+    "numpy==2.4.6",
+    "numpy-financial==1.0.0",
+    "jsonschema==4.26.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest==8.4.2"]
+
+[tool.pytest.ini_options]
+# Run from the repo root without an install step; `import engine` resolves here.
+pythonpath = ["."]
+testpaths = ["engine/tests"]
+addopts = "-q"
+markers = [
+    "network: test reaches the Energy-Charts API (deselect with -m 'not network')",
+]

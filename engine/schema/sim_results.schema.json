@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kellerwatt.energy/schema/sim_results.schema.json",
+  "title": "KellerWatt simulation results",
+  "description": "Wire format for the arbitrage engine output. Every reported metric carries a methodology_label and a status (validated|estimate|provisional). The lp_ceiling strategy is the only validated figure; causal_walkforward is an estimate; IRR/payback are provisional pending external diligence.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "provenance", "solver", "assumptions", "strategies", "scenarios"],
+  "properties": {
+    "schema_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["price_zone", "data_source", "years", "generated_utc"],
+      "properties": {
+        "price_zone": {"type": "string"},
+        "data_source": {"type": "string"},
+        "source_url": {"type": "string"},
+        "years": {"type": "array", "items": {"type": "integer"}, "minItems": 1},
+        "generated_utc": {"type": "string"},
+        "git_commit": {"type": ["string", "null"]},
+        "note": {"type": "string"}
+      }
+    },
+    "solver": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version", "status", "mip_gap_tolerance"],
+      "properties": {
+        "name": {"type": "string"},
+        "version": {"type": "string"},
+        "status": {"type": "string"},
+        "mip_gap_tolerance": {"type": ["number", "null"]}
+      }
+    },
+    "assumptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["battery", "business_plan", "cycle_cap_per_day", "operating_days", "ancillary_eur", "fees"],
+      "properties": {
+        "battery": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["capacity_kwh", "power_kw", "soc_min_frac", "soc_max_frac", "usable_kwh", "rte", "eta_one_way"],
+          "properties": {
+            "capacity_kwh": {"type": "number"},
+            "power_kw": {"type": "number"},
+            "soc_min_frac": {"type": "number"},
+            "soc_max_frac": {"type": "number"},
+            "usable_kwh": {"type": "number"},
+            "rte": {"type": "number"},
+            "eta_one_way": {"type": "number"}
+          }
+        },
+        "business_plan": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["assumed_spread_eur_mwh", "assumed_cycles_per_day", "assumed_gross_eur"],
+          "properties": {
+            "assumed_spread_eur_mwh": {"type": "number"},
+            "assumed_cycles_per_day": {"type": "number"},
+            "assumed_gross_eur": {"type": "number"}
+          }
+        },
+        "cycle_cap_per_day": {"type": ["number", "null"]},
+        "operating_days": {"type": "integer"},
+        "ancillary_eur": {"type": "number"},
+        "fees": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["bkv_fee_basis", "bkv_fee_rate", "grid_energy_fee_eur_mwh_charge"],
+          "properties": {
+            "bkv_fee_basis": {"$ref": "#/$defs/fee_basis"},
+            "bkv_fee_rate": {"type": "number"},
+            "grid_energy_fee_eur_mwh_charge": {"type": "number"}
+          }
+        }
+      }
+    },
+    "strategies": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/strategy"}
+    },
+    "scenarios": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/scenario"}
+    }
+  },
+  "$defs": {
+    "status": {
+      "enum": ["validated", "estimate", "provisional"]
+    },
+    "fee_basis": {
+      "enum": ["gross_turnover", "sale_turnover", "net_margin"]
+    },
+    "metric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "unit", "methodology_label", "status"],
+      "properties": {
+        "value": {"type": ["number", "null"]},
+        "unit": {"type": "string"},
+        "methodology_label": {"type": "string"},
+        "status": {"$ref": "#/$defs/status"}
+      }
+    },
+    "year_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["year", "ceiling_eur_mwh", "causal_eur_mwh", "cycles_ac", "cycles_cell", "gross_eur", "mwh_discharged", "day_count", "simul_max"],
+      "properties": {
+        "year": {"type": "integer"},
+        "ceiling_eur_mwh": {"type": ["number", "null"]},
+        "causal_eur_mwh": {"type": ["number", "null"]},
+        "cycles_ac": {"type": ["number", "null"]},
+        "cycles_cell": {"type": ["number", "null"]},
+        "gross_eur": {"type": ["number", "null"]},
+        "mwh_discharged": {"type": ["number", "null"]},
+        "day_count": {"type": "integer"},
+        "simul_max": {"type": ["number", "null"]}
+      }
+    },
+    "strategy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "methodology_label", "status", "years"],
+      "properties": {
+        "id": {"enum": ["lp_ceiling", "causal_walkforward"]},
+        "methodology_label": {"type": "string"},
+        "status": {"$ref": "#/$defs/status"},
+        "years": {"type": "array", "items": {"$ref": "#/$defs/year_result"}}
+      }
+    },
+    "scenario": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "grid_energy_fee_eur_mwh_charge", "implied_spread", "irr", "payback_years"],
+      "properties": {
+        "id": {"enum": ["causal_exemption_retained", "causal_exemption_lost"]},
+        "label": {"type": "string"},
+        "grid_energy_fee_eur_mwh_charge": {"type": "number"},
+        "net_annual_eur": {"type": ["number", "null"]},
+        "implied_spread": {"$ref": "#/$defs/metric"},
+        "irr": {"$ref": "#/$defs/metric"},
+        "payback_years": {"$ref": "#/$defs/metric"}
+      }
+    }
+  }
+}
