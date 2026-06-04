@@ -142,3 +142,8 @@ Greenfield. **3 design docs + DESIGN.md committed and pushed** to
 `github.com/Nikerane/kellerwatt-sim` (public, branch `main`). **No app code yet** — by design;
 the architecture and brand foundation were locked first. Repo is **local + GitHub**; nothing
 else is deployed.
+
+**Validated (2026-06-04):** `scripts/validate_number.py` ran the corrected perfect-foresight LP
+on real 2024 DE-LU prices → implied spread **€62–68/MWh at ~1.4 cycles/day**, vs the assumed
+€80/MWh & 1.5. The arbitrage assumption is optimistic; re-base on ~€60/MWh. See
+`docs/codex-review-response.md` for the full result and the disposition of all 18 findings.

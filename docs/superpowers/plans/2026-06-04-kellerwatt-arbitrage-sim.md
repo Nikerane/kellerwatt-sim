@@ -1,5 +1,13 @@
 # KellerWatt Battery-Arbitrage Simulation — Implementation Plan
 
+> **Corrections required before executing (Codex review, 2026-06-04):** see
+> `docs/codex-review-response.md`. Key carry-ins: no simultaneous charge/discharge (binary
+> mutual-exclusion, verified in `scripts/validate_number.py`); group delivery days by
+> Europe/Berlin not UTC; marginal trading charges belong INSIDE the dispatch objective;
+> replace Streamlit T11–T12 with a tested `export_results.py` (schema-versioned JSON);
+> present the LP as a perfect-foresight ceiling (no capture-% fudge); fail loud on data gaps.
+> The 2024 backtest already ran: implied spread ≈ **€62–68/MWh**, not €80.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** A Streamlit dashboard that backtests a 200 kWh basement battery on real German day-ahead prices and reconciles the result against the business-plan assumptions (implied €/MWh & cycles/day vs the assumed €80/1.5), with judge-draggable stress-test sliders.
