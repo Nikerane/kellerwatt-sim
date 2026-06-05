@@ -303,15 +303,22 @@ export function PlaygroundPage() {
         </div>
       </section>
 
-      <footer className="kw-footer">
-        <Eyebrow>How this works</Eyebrow>
-        <p style={{ marginTop: 14 }}>
-          HiGHS — an open-source optimisation solver — reads real DE-LU day-ahead
-          prices from Energy-Charts and finds the best possible charge/discharge
-          schedule for each day. Best-case assumes perfect knowledge of tomorrow's
-          prices. Realistic uses only past data, like a real operator would.
-        </p>
-      </footer>
+      <section className="kw-section kw-section--bone">
+        <div className="kw-section__inner">
+          <Eyebrow>How this works</Eyebrow>
+          <p className="kw-lead" style={{ marginTop: 18 }}>
+            HiGHS — an open-source optimisation solver — reads real DE-LU day-ahead
+            prices from Energy-Charts and finds the best possible charge/discharge
+            schedule for each day. Best-case assumes perfect knowledge of tomorrow's
+            prices. Realistic uses only past data, like a real operator would.
+          </p>
+          <p className="kw-lead" style={{ marginTop: 14, fontSize: "0.85rem", opacity: 0.7 }}>
+            Every solve is live — the engine runs on a Hugging Face Space.
+            Results from the Validation page are baked in at build time and
+            use the same solver and data.
+          </p>
+        </div>
+      </section>
     </main>
   );
 }

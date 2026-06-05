@@ -69,12 +69,12 @@ export function MethodologyPage() {
             />
             <MethodStep
               num="2"
-              title="Solve the ceiling LP"
+              title="Solve the best-case LP"
               body={`For each day, a linear program finds the profit-maximising charge-discharge schedule with perfect knowledge of the next 24 hours of prices. This is the upper bound — no real operator can achieve this, but it's a validated benchmark. The solver is HiGHS, an open-source MILP solver.`}
             />
             <MethodStep
               num="3"
-              title="Run the causal walk-forward"
+              title="Run the realistic strategy"
               body={`A realistic strategy that decides charge/discharge with a 28-day trailing threshold — it sees only past prices, not future ones. This produces the backtested estimate.`}
             />
             <MethodStep

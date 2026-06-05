@@ -102,17 +102,37 @@ export function PlaygroundChart({ data }: Props) {
         <path className="kw-chart__causal" d={linePath(causPts)} />
         <path className="kw-chart__ceiling" d={linePath(ceilPts)} />
 
-        {ceilPts.map(([cx, cy], i) => (
-          <g key={i}>
-            <circle className="kw-chart__dot" cx={cx} cy={cy} r={4.5} />
+        {ceilPts.map(([cx, cy], i) => {
+          // stagger labels: even years above, odd years below — prevents overlap when values are close
+          const above = i % 2 === 0;
+          const ly = above ? cy - 14 : cy + 20;
+          return (
+            <g key={i}>
+              <circle className="kw-chart__dot" cx={cx} cy={cy} r={4.5} />
+              <text
+                className="kw-chart__axis"
+                x={cx}
+                y={ly}
+                textAnchor="middle"
+                style={{ fill: "var(--ember)", fontSize: 13 }}
+              >
+                €{ceiling[i].toFixed(1)}
+              </text>
+            </g>
+          );
+        })}
+
+        {causPts.map(([cx, cy], i) => (
+          <g key={`causal-${i}`}>
+            <circle className="kw-chart__dot" cx={cx} cy={cy} r={3} style={{ fill: "rgba(245,241,234,0.7)" }} />
             <text
               className="kw-chart__axis"
               x={cx}
-              y={cy - 14}
+              y={cy + 18}
               textAnchor="middle"
-              style={{ fill: "var(--ember)", fontSize: 13 }}
+              style={{ fontSize: 11, opacity: 0.7 }}
             >
-              €{ceiling[i].toFixed(1)}
+              €{causal[i].toFixed(1)}
             </text>
           </g>
         ))}
