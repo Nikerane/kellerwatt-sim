@@ -264,7 +264,7 @@ export function PlaygroundPage() {
       </section>
 
       {/* Sliders panel */}
-      <section className="kw-section kw-section--hearth">
+      <section className="kw-section kw-section--bone">
         <div className="kw-section__inner">
           <div
             style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 28 }}
@@ -301,8 +301,7 @@ export function PlaygroundPage() {
                 style={{
                   fontFamily: "var(--sans)",
                   fontSize: "0.85rem",
-                  color: "var(--bone)",
-                  opacity: 0.7,
+                  color: "var(--slate)",
                 }}
               >
                 §118(6) exemption
@@ -330,13 +329,19 @@ export function PlaygroundPage() {
         </div>
       </section>
 
-      {/* Results */}
+      {/* Results table */}
       <section className="kw-section kw-section--bone">
         <div className="kw-section__inner">
           <Eyebrow ember>Results — live solved</Eyebrow>
           <div style={{ overflowX: "auto" }}>
             <PlaygroundResults data={response} year={latest} />
           </div>
+        </div>
+      </section>
+
+      {/* Chart */}
+      <section className="kw-section kw-section--hearth">
+        <div className="kw-section__inner">
           <PlaygroundChart data={response} />
         </div>
       </section>

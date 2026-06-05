@@ -152,7 +152,7 @@ export function PlaygroundChart({ data }: Props) {
         <span>
           <span
             className="kw-chart__swatch"
-            style={{ borderColor: "rgba(44,46,45,0.7)" }}
+            style={{ borderColor: "rgba(245,241,234,0.85)" }}
           />
           Realistic
         </span>
@@ -160,7 +160,7 @@ export function PlaygroundChart({ data }: Props) {
           <span
             className="kw-chart__swatch"
             style={{
-              borderColor: "rgba(44,46,45,0.35)",
+              borderColor: "rgba(245,241,234,0.45)",
               borderTopStyle: "dashed",
             }}
           />
