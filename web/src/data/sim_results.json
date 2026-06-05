@@ -1,0 +1,178 @@
+{
+  "schema_version": "1.0.0",
+  "provenance": {
+    "price_zone": "DE-LU",
+    "data_source": "Energy-Charts",
+    "source_url": "https://api.energy-charts.info/price",
+    "years": [
+      2023,
+      2024,
+      2025
+    ],
+    "generated_utc": "2026-06-05T05:11:16Z",
+    "git_commit": "f9d3c3d54ceadd92061c514987b5b0cae8bcffe5",
+    "note": "Ceilings are perfect-foresight upper bounds on real DE-LU prices. Causal is a backtested estimate, not a floor. Deck claimed EUR 9,947 gross; reconciled identity at EUR 80/MWh, 1.5 cyc = EUR 7,884 (Codex 7)."
+  },
+  "solver": {
+    "name": "HiGHS",
+    "version": "1.14.0",
+    "status": "Optimal",
+    "mip_gap_tolerance": 0.0
+  },
+  "assumptions": {
+    "battery": {
+      "capacity_kwh": 200.0,
+      "power_kw": 50.0,
+      "soc_min_frac": 0.1,
+      "soc_max_frac": 1.0,
+      "usable_kwh": 180.0,
+      "rte": 0.9,
+      "eta_one_way": 0.9486832980505138
+    },
+    "business_plan": {
+      "assumed_spread_eur_mwh": 80.0,
+      "assumed_cycles_per_day": 1.5,
+      "assumed_gross_eur": 7884.0
+    },
+    "cycle_cap_per_day": 1.5,
+    "operating_days": 365,
+    "ancillary_eur": 0.0,
+    "fees": {
+      "bkv_fee_basis": "net_margin",
+      "bkv_fee_rate": 0.0,
+      "grid_energy_fee_eur_mwh_charge": 0.0
+    }
+  },
+  "strategies": [
+    {
+      "id": "lp_ceiling",
+      "methodology_label": "perfect-foresight day-ahead upper bound (cyclic, capped)",
+      "status": "validated",
+      "years": [
+        {
+          "year": 2023,
+          "ceiling_eur_mwh": 61.1,
+          "causal_eur_mwh": null,
+          "cycles_ac": 1.347,
+          "cycles_cell": 1.419,
+          "gross_eur": 5403.0,
+          "mwh_discharged": 88.48,
+          "day_count": 365,
+          "simul_max": 0.0
+        },
+        {
+          "year": 2024,
+          "ceiling_eur_mwh": 68.3,
+          "causal_eur_mwh": null,
+          "cycles_ac": 1.365,
+          "cycles_cell": 1.439,
+          "gross_eur": 6148.0,
+          "mwh_discharged": 89.95,
+          "day_count": 366,
+          "simul_max": 0.0
+        },
+        {
+          "year": 2025,
+          "ceiling_eur_mwh": 77.3,
+          "causal_eur_mwh": null,
+          "cycles_ac": 1.384,
+          "cycles_cell": 1.459,
+          "gross_eur": 7030.0,
+          "mwh_discharged": 90.95,
+          "day_count": 365,
+          "simul_max": 0.0
+        }
+      ]
+    },
+    {
+      "id": "causal_walkforward",
+      "methodology_label": "causal walk-forward (28-day trailing thresholds, continuous SoC)",
+      "status": "estimate",
+      "years": [
+        {
+          "year": 2023,
+          "ceiling_eur_mwh": null,
+          "causal_eur_mwh": 37.6,
+          "cycles_ac": 0.693,
+          "cycles_cell": 0.73,
+          "gross_eur": 1711.0,
+          "mwh_discharged": 45.53,
+          "day_count": 365,
+          "simul_max": 0.0
+        },
+        {
+          "year": 2024,
+          "ceiling_eur_mwh": null,
+          "causal_eur_mwh": 51.4,
+          "cycles_ac": 0.695,
+          "cycles_cell": 0.732,
+          "gross_eur": 2352.0,
+          "mwh_discharged": 45.77,
+          "day_count": 366,
+          "simul_max": 0.0
+        },
+        {
+          "year": 2025,
+          "ceiling_eur_mwh": null,
+          "causal_eur_mwh": 57.4,
+          "cycles_ac": 0.867,
+          "cycles_cell": 0.914,
+          "gross_eur": 3272.0,
+          "mwh_discharged": 56.96,
+          "day_count": 365,
+          "simul_max": 0.0
+        }
+      ]
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "causal_exemption_retained",
+      "label": "\u00a7118(6) exemption retained \u2014 grid energy fee on charge = 0",
+      "grid_energy_fee_eur_mwh_charge": 0.0,
+      "net_annual_eur": 3272.0,
+      "implied_spread": {
+        "value": 57.4,
+        "unit": "eur_mwh",
+        "methodology_label": "causal walk-forward (28-day trailing thresholds, continuous SoC), net of grid fee (2025)",
+        "status": "estimate"
+      },
+      "irr": {
+        "value": null,
+        "unit": "ratio",
+        "methodology_label": "constant-EBITDA project IRR",
+        "status": "provisional"
+      },
+      "payback_years": {
+        "value": null,
+        "unit": "years",
+        "methodology_label": "constant-EBITDA payback",
+        "status": "provisional"
+      }
+    },
+    {
+      "id": "causal_exemption_lost",
+      "label": "\u00a7118(6) exemption lost \u2014 provisional grid energy fee on charge (pending #9)",
+      "grid_energy_fee_eur_mwh_charge": 30.0,
+      "net_annual_eur": 2272.0,
+      "implied_spread": {
+        "value": 68.6,
+        "unit": "eur_mwh",
+        "methodology_label": "causal walk-forward (28-day trailing thresholds, continuous SoC), net of grid fee (2025)",
+        "status": "estimate"
+      },
+      "irr": {
+        "value": null,
+        "unit": "ratio",
+        "methodology_label": "constant-EBITDA project IRR",
+        "status": "provisional"
+      },
+      "payback_years": {
+        "value": null,
+        "unit": "years",
+        "methodology_label": "constant-EBITDA payback",
+        "status": "provisional"
+      }
+    }
+  ]
+}

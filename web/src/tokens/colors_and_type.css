@@ -1,0 +1,43 @@
+/* KellerWatt design tokens — authoritative values from DESIGN.md.
+   Six tokens + Clay-red, three families. Flat fields only: no gradients. */
+:root {
+  /* color */
+  --hearth: #1f3a34; /* identity; dark-green surfaces */
+  --hearth-ink: #142621; /* pressed/shadow variant */
+  --ember: #e89b4f; /* ACCENT/SIGNAL ONLY — one per screen */
+  --bone: #f5f1ea; /* default warm off-white surface */
+  --paper: #fbf8f2; /* cards-on-bone, one step lighter */
+  --slate: #2c2e2d; /* primary text on light (never pure black) */
+  --stone: #e8e2d7; /* dividers, quiet rails */
+  --dusk: #4a3850; /* depth, off-peak, shadows */
+  --clay-red: #d98a7a; /* NEGATIVE VALUES ONLY */
+  --app-surface: #101d18; /* owner-app dark surface */
+
+  /* type */
+  --serif: "Fraunces Variable", Fraunces, Georgia, serif;
+  --sans: "Inter Variable", Inter, system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* radius */
+  --r-4: 4px;
+  --r-8: 8px;
+  --r-12: 12px;
+  --r-18: 18px;
+  --r-24: 24px;
+  --r-pill: 999px;
+
+  /* borders / shadow */
+  --hairline: 0.5px solid rgba(44, 46, 45, 0.1);
+  --shadow-resting: 0 1px 0 rgba(44, 46, 45, 0.04), 0 8px 24px -12px rgba(20, 38, 33, 0.18);
+  --shadow-hover: 0 1px 0 rgba(44, 46, 45, 0.06), 0 14px 36px -14px rgba(20, 38, 33, 0.26);
+
+  /* motion */
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --t-state: 120ms;
+  --t-transition: 220ms;
+  --t-entrance: 420ms;
+
+  /* layout */
+  --max-width: 1200px;
+  --gutter: 24px;
+}

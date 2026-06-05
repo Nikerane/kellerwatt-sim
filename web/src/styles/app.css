@@ -1,0 +1,390 @@
+/* KellerWatt honesty page — editorial, warm, calm. One idea per section,
+   Hearth/Bone alternation, a single Ember signal, Clay-red for negatives only. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+  background: var(--bone);
+  color: var(--slate);
+  font-family: var(--sans);
+  font-size: 17px;
+  line-height: 1.6;
+  font-synthesis: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ember);
+  outline-offset: 3px;
+  border-radius: var(--r-4);
+}
+
+::selection {
+  background: rgba(232, 155, 79, 0.22);
+}
+
+/* ---- layout ------------------------------------------------------------- */
+
+.kw-page {
+  width: 100%;
+}
+
+.kw-section {
+  width: 100%;
+  border-top: var(--hairline);
+}
+
+.kw-section__inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: clamp(56px, 9vw, 120px) var(--gutter);
+}
+
+.kw-section--hearth {
+  background: var(--hearth);
+  color: var(--bone);
+  border-top: none;
+  /* hex-cell texture — the only texture we own, Hearth/dark only, ~6% opacity */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='48' viewBox='0 0 56 48'%3E%3Cpath fill='none' stroke='%23F5F1EA' stroke-opacity='0.06' stroke-width='1' d='M14 0 L28 8 L28 24 L14 32 L0 24 L0 8 Z M42 0 L56 8 L56 24 L42 32 L28 24 L28 8 Z M14 32 L28 40 L28 56 L14 64 L0 56 L0 40 Z M42 32 L56 40 L56 56 L42 64 L28 56 L28 40 Z'/%3E%3C/svg%3E");
+  background-size: 56px 48px;
+}
+
+.kw-section--bone {
+  background: var(--bone);
+}
+
+.kw-eyebrow + .kw-section__lead,
+.kw-eyebrow + * {
+  margin-top: 18px;
+}
+
+/* ---- primitives --------------------------------------------------------- */
+
+.kw-eyebrow {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: rgba(44, 46, 45, 0.55);
+}
+
+.kw-section--hearth .kw-eyebrow {
+  color: rgba(245, 241, 234, 0.6);
+}
+
+.kw-eyebrow--ember {
+  color: var(--ember);
+}
+
+.kw-couplet {
+  font-family: var(--serif);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.08;
+  margin: 0;
+  text-wrap: balance;
+}
+
+.kw-couplet--xl {
+  font-size: clamp(2.6rem, 6.2vw, 4.6rem);
+}
+.kw-couplet--lg {
+  font-size: clamp(2rem, 4.4vw, 3.1rem);
+}
+.kw-couplet--md {
+  font-size: clamp(1.5rem, 3vw, 2.1rem);
+}
+
+.kw-couplet__a {
+  display: block;
+}
+.kw-couplet__b {
+  display: block;
+  color: inherit;
+  opacity: 0.62;
+}
+
+.kw-mono {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+  letter-spacing: -0.01em;
+}
+.kw-mono--neutral {
+  color: inherit;
+}
+.kw-mono--ember {
+  color: var(--ember);
+}
+.kw-mono--clay {
+  color: var(--clay-red);
+}
+.kw-mono--muted {
+  color: rgba(44, 46, 45, 0.5);
+}
+.kw-section--hearth .kw-mono--muted {
+  color: rgba(245, 241, 234, 0.5);
+}
+.kw-mono--xl {
+  font-size: clamp(2.4rem, 5.5vw, 3.6rem);
+  font-weight: 500;
+}
+.kw-mono--lg {
+  font-size: 1.6rem;
+  font-weight: 500;
+}
+.kw-mono--md {
+  font-size: 1.05rem;
+}
+.kw-mono--sm {
+  font-size: 0.85rem;
+}
+
+.kw-card {
+  background: var(--paper);
+  border: var(--hairline);
+  border-radius: var(--r-18);
+  box-shadow: var(--shadow-resting);
+  padding: clamp(24px, 3.4vw, 40px);
+}
+
+.kw-lead {
+  font-size: clamp(1.05rem, 1.6vw, 1.3rem);
+  line-height: 1.62;
+  max-width: 62ch;
+  color: rgba(44, 46, 45, 0.82);
+}
+.kw-section--hearth .kw-lead {
+  color: rgba(245, 241, 234, 0.84);
+}
+
+/* ---- hero --------------------------------------------------------------- */
+
+.kw-hero__eyebrow {
+  margin-bottom: 28px;
+}
+.kw-hero__lead {
+  margin-top: 28px;
+}
+.kw-hero__meta {
+  margin-top: 40px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 28px;
+  align-items: baseline;
+}
+
+/* ---- honesty table ------------------------------------------------------ */
+
+.kw-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+}
+.kw-table caption {
+  text-align: left;
+}
+.kw-table th,
+.kw-table td {
+  text-align: right;
+  padding: 16px 14px;
+  border: none;
+  border-bottom: var(--hairline);
+  vertical-align: baseline;
+}
+.kw-table thead th {
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--slate);
+  border-bottom: 0.5px solid rgba(44, 46, 45, 0.22);
+}
+.kw-table th[scope="row"] {
+  text-align: left;
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1.12rem;
+  white-space: nowrap;
+}
+.kw-table__row-note {
+  display: block;
+  font-family: var(--sans);
+  font-style: normal;
+  font-size: 0.8rem;
+  color: rgba(44, 46, 45, 0.52);
+  margin-top: 3px;
+  font-weight: 400;
+}
+.kw-table__col-validated {
+  background: rgba(232, 155, 79, 0.05);
+}
+.kw-table tbody tr:last-child td,
+.kw-table tbody tr:last-child th {
+  border-bottom: none;
+}
+.kw-status {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: var(--r-pill);
+  border: 0.5px solid currentColor;
+  margin-top: 6px;
+}
+.kw-status--validated {
+  color: #2f6f5e;
+}
+.kw-status--estimate {
+  color: rgba(44, 46, 45, 0.6);
+}
+.kw-status--provisional {
+  color: var(--dusk);
+}
+
+/* ---- chart -------------------------------------------------------------- */
+
+.kw-chart {
+  width: 100%;
+}
+.kw-chart svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+.kw-chart__axis {
+  font-family: var(--mono);
+  font-size: 11px;
+  fill: rgba(245, 241, 234, 0.55);
+}
+.kw-chart__grid {
+  stroke: rgba(245, 241, 234, 0.1);
+  stroke-width: 1;
+}
+.kw-chart__assumed {
+  stroke: rgba(245, 241, 234, 0.45);
+  stroke-width: 1.5;
+  stroke-dasharray: 2 5;
+  fill: none;
+}
+.kw-chart__ceiling {
+  stroke: var(--ember);
+  stroke-width: 2.5;
+  fill: none;
+}
+.kw-chart__causal {
+  stroke: rgba(245, 241, 234, 0.85);
+  stroke-width: 2;
+  fill: none;
+}
+.kw-chart__bracket {
+  fill: rgba(232, 155, 79, 0.1);
+}
+.kw-chart__dot {
+  fill: var(--ember);
+}
+.kw-chart__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  margin-top: 28px;
+  font-size: 0.86rem;
+}
+.kw-chart__swatch {
+  display: inline-block;
+  width: 22px;
+  height: 0;
+  border-top-width: 2.5px;
+  border-top-style: solid;
+  margin-right: 9px;
+  vertical-align: middle;
+}
+
+/* ---- diligence ---------------------------------------------------------- */
+
+.kw-diligence__list {
+  list-style: none;
+  margin: 24px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 16px;
+}
+.kw-diligence__item {
+  display: flex;
+  gap: 16px;
+  align-items: baseline;
+  padding-bottom: 16px;
+  border-bottom: var(--hairline);
+}
+.kw-diligence__tag {
+  flex: 0 0 auto;
+}
+
+.kw-footer {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 32px var(--gutter) 56px;
+  font-size: 0.82rem;
+  color: rgba(44, 46, 45, 0.5);
+}
+.kw-footer .kw-mono {
+  font-size: 0.78rem;
+}
+
+/* ---- grids -------------------------------------------------------------- */
+
+.kw-split {
+  display: grid;
+  gap: clamp(32px, 5vw, 72px);
+  grid-template-columns: 1fr;
+}
+@media (min-width: 880px) {
+  .kw-split--chart {
+    grid-template-columns: 0.9fr 1.1fr;
+    align-items: center;
+  }
+}
+
+/* ---- motion: fadeUp entrance only, respects reduced motion -------------- */
+
+@keyframes kw-fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.kw-fade {
+  animation: kw-fadeUp var(--t-entrance) var(--ease) both;
+}
+.kw-fade--2 {
+  animation-delay: 90ms;
+}
+.kw-fade--3 {
+  animation-delay: 180ms;
+}
+@media (prefers-reduced-motion: reduce) {
+  .kw-fade,
+  .kw-fade--2,
+  .kw-fade--3 {
+    animation: none;
+  }
+}
