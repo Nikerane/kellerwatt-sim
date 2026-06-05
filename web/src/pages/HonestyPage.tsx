@@ -151,7 +151,7 @@ export function HonestyPage() {
           (HiGHS — open-source, industry-standard) on real {p.price_zone} day-ahead
           electricity prices from {p.data_source}, {p.years.join(" / ")}. The solver
           finds the profit-maximising charge/discharge schedule for each day given
-          the battery's specs. Best-case assumes perfect knowledge of tomorrow's
+          the battery's specs. Best-case assumes perfect knowledge of that day's
           prices. Realistic uses only past data.
         </p>
       </footer>

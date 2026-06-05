@@ -10,6 +10,10 @@ export function MethodologyPage() {
   const latest = Math.max(...YEARS);
   const cyclesPerDay = bp.assumed_cycles_per_day;
   const usable = battery.usable_kwh;
+  // Capture % for latest year: realistic gross / best-case gross
+  const ceilLatest = results.strategies.find(s => s.id === "lp_ceiling")!.years.find(y => y.year === latest)!;
+  const causLatest = results.strategies.find(s => s.id === "causal_walkforward")!.years.find(y => y.year === latest)!;
+  const capturePct = Math.round((causLatest.gross_eur! / ceilLatest.gross_eur!) * 100);
 
   return (
     <main className="kw-page">
@@ -58,30 +62,72 @@ export function MethodologyPage() {
           <p className="kw-lead" style={{ marginTop: 18, marginBottom: 24 }}>
             The validated best-case and realistic figures come from running{" "}
             <strong>HiGHS</strong> — an open-source linear optimisation solver —
-            on real Energy-Charts day-ahead prices across {YEARS.length} years.
+            on real Energy-Charts day-ahead prices across {YEARS.length} years
+            ({YEARS[0]} to {latest}). Both strategies use the exact same data
+            — ~26,000 hourly prices over 1,095 days. The difference is what they
+            are allowed to know.
           </p>
 
-          <div style={{ display: "grid", gap: 16 }}>
-            <MethodStep
-              num="1"
-              title="Load real prices"
-              body={`For each day from ${YEARS[0]} to ${latest}, fetch DE-LU day-ahead hourly prices from Energy-Charts.info. These are the actual market-clearing prices — not forecasts.`}
-            />
-            <MethodStep
-              num="2"
-              title="Solve the best-case LP"
-              body={`For each day, a linear program finds the profit-maximising charge-discharge schedule with perfect knowledge of the next 24 hours of prices. This is the upper bound — no real operator can achieve this, but it's a validated benchmark. The solver is HiGHS, an open-source MILP solver.`}
-            />
-            <MethodStep
-              num="3"
-              title="Run the realistic strategy"
-              body={`A realistic strategy that decides charge/discharge with a 28-day trailing threshold — it sees only past prices, not future ones. This produces the backtested estimate.`}
-            />
-            <MethodStep
-              num="4"
-              title="Compute implied spreads"
-              body={`Annual gross € ÷ MWh discharged = implied spread in €/MWh. This is the single number that makes the cases comparable — the same "price difference captured per unit of energy" regardless of battery size or cycle count.`}
-            />
+          {/* Best-case */}
+          <div style={{
+            background: "var(--paper)", padding: "20px 24px",
+            borderRadius: "var(--r-12)", border: "var(--hairline)",
+            marginBottom: 20,
+          }}>
+            <strong style={{ fontFamily: "var(--serif)", fontWeight: 500, fontSize: "1.1rem" }}>
+              1. Best-case — the linear program
+            </strong>
+            <p style={{ marginTop: 10, opacity: 0.75, lineHeight: 1.6 }}>
+              An LP (Linear Program) is a mathematical optimisation technique.
+              HiGHS gets all 24 hourly prices for a given day and finds the
+              charge/discharge schedule that maximises profit. It can charge
+              when prices are cheap and discharge when they are expensive —{" "}
+              <strong>because it already knows every price for that day.</strong>
+            </p>
+            <p style={{ marginTop: 8, opacity: 0.6, fontSize: "0.9rem" }}>
+              This is an <strong>upper bound</strong>. No real operator can achieve
+              it — you don't know the next hour's price. But it's useful as a
+              benchmark: the actual result can never be higher. Every number is
+              validated to the decimal on real data, not a forecast.
+            </p>
+          </div>
+
+          {/* Realistic */}
+          <div style={{
+            background: "var(--paper)", padding: "20px 24px",
+            borderRadius: "var(--r-12)", border: "var(--hairline)",
+            marginBottom: 20,
+          }}>
+            <strong style={{ fontFamily: "var(--serif)", fontWeight: 500, fontSize: "1.1rem" }}>
+              2. Realistic — the causal walk-forward
+            </strong>
+            <p style={{ marginTop: 10, opacity: 0.75, lineHeight: 1.6 }}>
+              This strategy operates <strong>blind to the future.</strong> At hour 1,
+              it knows only the price right now and the prices of the past 28 days.
+              It uses a trailing threshold: if today's price is below the 28-day
+              percentile, buy. If above, sell. No foresight — same information a
+              real operator has.
+            </p>
+            <p style={{ marginTop: 8, opacity: 0.6, fontSize: "0.9rem" }}>
+              This is a <strong>backtested estimate</strong> — what a real operator
+              with a simple rules-based strategy could have earned. It consistently
+              captures {capturePct}% of the best-case over {latest}.
+            </p>
+          </div>
+
+          {/* Summarising step */}
+          <div style={{
+            background: "var(--paper)", padding: "20px 24px",
+            borderRadius: "var(--r-12)", border: "var(--hairline)",
+          }}>
+            <strong style={{ fontFamily: "var(--serif)", fontWeight: 500, fontSize: "1.1rem" }}>
+              3. Implied spreads — the common yardstick
+            </strong>
+            <p style={{ marginTop: 10, opacity: 0.75, lineHeight: 1.6 }}>
+              Annual gross € ÷ MWh discharged = implied spread in €/MWh. Whether
+              the battery is 200 kWh or 350 kWh, the spread is the same metric —
+              the price difference captured per unit of energy.
+            </p>
           </div>
         </div>
       </section>
@@ -122,30 +168,6 @@ function StatCard({ label, value }: { label: string; value: string }) {
         {label}
       </div>
       <DataMono size="md">{value}</DataMono>
-    </div>
-  );
-}
-
-function MethodStep({ num, title, body }: { num: string; title: string; body: string }) {
-  return (
-    <div style={{ display: "flex", gap: 16, alignItems: "baseline" }}>
-      <span style={{
-        flex: "0 0 auto", width: 28, height: 28,
-        borderRadius: "50%", background: "var(--hearth)",
-        color: "var(--bone)", display: "flex", alignItems: "center",
-        justifyContent: "center", fontSize: "0.78rem",
-        fontFamily: "var(--mono)", fontWeight: 500,
-      }}>
-        {num}
-      </span>
-      <div>
-        <strong style={{ fontFamily: "var(--serif)", fontWeight: 500, fontSize: "1.05rem" }}>
-          {title}
-        </strong>
-        <p style={{ margin: "4px 0 0", opacity: 0.72, fontSize: "0.92rem", lineHeight: 1.55 }}>
-          {body}
-        </p>
-      </div>
     </div>
   );
 }

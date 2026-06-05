@@ -309,7 +309,7 @@ export function PlaygroundPage() {
             <p className="kw-lead">
               The chart shows implied spreads — the price difference the battery
               captures per megawatt-hour discharged. Best-case assumes perfect
-              knowledge of tomorrow's prices. Realistic uses only past data.
+              knowledge of that day's prices. Realistic uses only past data.
               Hit Compute after changing the sliders to see the curves shift.
             </p>
             <PlaygroundChart data={response} />
@@ -322,7 +322,7 @@ export function PlaygroundPage() {
         <p style={{ marginTop: 14 }}>
           HiGHS — an open-source optimisation solver — reads real DE-LU day-ahead
           prices from Energy-Charts and finds the best possible charge/discharge
-          schedule for each day. Best-case assumes perfect knowledge of tomorrow's
+          schedule for each day. Best-case assumes perfect knowledge of that day's
           prices. Realistic uses only past data, like a real operator would.
         </p>
       </footer>
