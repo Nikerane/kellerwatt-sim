@@ -20,6 +20,15 @@ export interface YearResult {
   mwh_discharged: number | null;
   day_count: number;
   simul_max: number | null;
+  neg_price_cashflow_eur: number | null;
+}
+
+export interface MarketYear {
+  year: number;
+  negative_intervals: number;
+  price_min: number;
+  price_max: number;
+  day_count: number;
 }
 
 export interface Strategy {
@@ -65,4 +74,5 @@ export interface SimResults {
   };
   strategies: Strategy[];
   scenarios: Scenario[];
+  market: MarketYear[];
 }

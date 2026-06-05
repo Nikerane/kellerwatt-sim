@@ -388,3 +388,44 @@ body {
     animation: none;
   }
 }
+
+/* ---- site nav ----------------------------------------------------------- */
+
+.kw-nav {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 18px var(--gutter);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 24px;
+}
+.kw-nav__brand {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--slate);
+  text-decoration: none;
+}
+.kw-nav__links {
+  display: flex;
+  gap: 22px;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.kw-nav__links a {
+  color: rgba(44, 46, 45, 0.55);
+  text-decoration: none;
+  padding-bottom: 2px;
+  border-bottom: 1.5px solid transparent;
+}
+.kw-nav__links a[aria-current="page"] {
+  color: var(--ember);
+  border-bottom-color: var(--ember);
+}
+.kw-nav__links a:hover {
+  color: var(--slate);
+}
