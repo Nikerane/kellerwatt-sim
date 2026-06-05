@@ -188,10 +188,10 @@ export function PlaygroundPage() {
     [values],
   );
 
-  // Auto-fetch a default day when engine first solves
+  // Auto-fetch the first seasonal date when engine is ready
   useEffect(() => {
     if (engineStatus === "solved" && dayDetail === null && ENGINE_URL) {
-      fetchDayDetail("2025-06-15");
+      fetchDayDetail("2025-03-21");
     }
   }, [engineStatus, dayDetail, fetchDayDetail]);
 
@@ -388,47 +388,49 @@ export function PlaygroundPage() {
       {/* Daily Dispatch */}
       <section className="kw-section kw-section--bone">
         <div className="kw-section__inner">
-          <Eyebrow>Daily dispatch</Eyebrow>
-          <p className="kw-lead" style={{ marginTop: 8, marginBottom: 20 }}>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginBottom: 18 }}>
+            <Eyebrow>Daily dispatch</Eyebrow>
+            {dayDetail && (
+              <span style={{
+                fontSize: "0.72rem",
+                fontFamily: "var(--mono)",
+                color: "#4CAF50",
+              }}>
+                Live solved ✓
+              </span>
+            )}
+          </div>
+          <p className="kw-lead" style={{ marginTop: 0, marginBottom: 22 }}>
             Per-interval charge / discharge on a real price curve. Ceiling is
-            perfect-foresight; causal is walk-forward. Compare best and worst days.
+            perfect-foresight; causal is walk-forward.
           </p>
 
-          {/* Navigation */}
+          {/* Day picker — best, worst, seasonal */}
           <div style={{
-            display: "flex", gap: 10, marginBottom: 24, flexWrap: "wrap",
+            display: "flex", gap: 8, marginBottom: 28, flexWrap: "wrap",
             alignItems: "center",
           }}>
-            <button
-              type="button"
-              className="kw-toggle__btn"
-              disabled={!dayDetail || dayLoading || selectedDate === dayDetail.best_date}
-              onClick={() => fetchDayDetail(dayDetail!.best_date)}
-              style={{ fontSize: "0.8rem" }}
-            >
-              ★ Best Day
-            </button>
-            <button
-              type="button"
-              className="kw-toggle__btn"
-              disabled={!dayDetail || dayLoading || selectedDate === dayDetail.worst_date}
-              onClick={() => fetchDayDetail(dayDetail!.worst_date)}
-              style={{ fontSize: "0.8rem" }}
-            >
-              ▼ Worst Day
-            </button>
-            <input
-              type="date"
-              className="kw-toggle__btn"
-              value={selectedDate}
-              min={dayDetail?.available_dates[0] ?? ""}
-              max={dayDetail?.available_dates[dayDetail.available_dates.length - 1] ?? ""}
-              onChange={(e) => fetchDayDetail(e.target.value)}
-              disabled={dayLoading}
-              style={{ fontSize: "0.8rem", fontFamily: "var(--mono)" }}
-            />
+            {[
+              { label: "★ Best Day", date: dayDetail?.best_date ?? "2025-01-20" },
+              { label: "▼ Worst Day", date: dayDetail?.worst_date ?? "2025-10-04" },
+              { label: "Mar 21", date: "2025-03-21" },
+              { label: "Jun 21", date: "2025-06-21" },
+              { label: "Jan 15", date: "2025-01-15" },
+            ].map(({ label, date }) => (
+              <button
+                key={date}
+                type="button"
+                className={`kw-dispatch-btn${date === selectedDate ? " kw-dispatch-btn--active" : ""}`}
+                disabled={dayLoading}
+                onClick={() => fetchDayDetail(date)}
+              >
+                {label}
+              </button>
+            ))}
             {dayLoading && (
-              <span style={{ fontSize: "0.78rem", opacity: 0.6 }}>Loading…</span>
+              <span style={{ fontSize: "0.78rem", opacity: 0.5, fontFamily: "var(--mono)" }}>
+                Loading…
+              </span>
             )}
           </div>
 
@@ -441,9 +443,9 @@ export function PlaygroundPage() {
               <DailyDispatchChart data={dayDetail} strategy="causal" />
             </div>
           )}
-          {!dayDetail && !ENGINE_URL && (
+          {!dayDetail && (
             <p style={{ fontSize: "0.88rem", opacity: 0.6 }}>
-              Daily dispatch requires the live engine backend.
+              Adjust sliders to see daily dispatch charts.
             </p>
           )}
         </div>

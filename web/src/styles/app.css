@@ -436,31 +436,47 @@ body {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
-  height: 4px;
-  border-radius: 2px;
-  background: var(--border);
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(44, 46, 45, 0.12);
   cursor: pointer;
+  outline: none;
+}
+
+.kw-slider__input:hover {
+  background: rgba(44, 46, 45, 0.18);
+}
+
+/* Firefox track */
+.kw-slider__input::-moz-range-track {
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(44, 46, 45, 0.12);
 }
 
 .kw-slider__input::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   background: var(--ember);
   cursor: pointer;
   border: 2px solid var(--bone);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.22);
+  transition: transform 0.12s var(--ease);
+}
+.kw-slider__input::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
 }
 
 .kw-slider__input::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   background: var(--ember);
   cursor: pointer;
   border: 2px solid var(--bone);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.22);
 }
 
 .kw-slider__input:disabled {
@@ -468,18 +484,26 @@ body {
   cursor: not-allowed;
 }
 
-/* ---- exemption toggle ---------------------------------------------------- */
+/* ---- buttons & toggles --------------------------------------------------- */
 
 .kw-toggle__btn {
-  padding: 4px 14px;
+  padding: 6px 16px;
   border: 1px solid var(--border);
-  border-radius: var(--r-4);
+  border-radius: var(--r-12);
   background: transparent;
   color: var(--slate);
   font-family: var(--mono);
   font-size: 0.82rem;
   cursor: pointer;
-  transition: border-color 0.2s, background 0.2s, color 0.2s;
+  transition: border-color var(--t-state) var(--ease),
+              background var(--t-state) var(--ease),
+              color var(--t-state) var(--ease);
+  user-select: none;
+}
+
+.kw-toggle__btn:hover:not(:disabled) {
+  border-color: rgba(44, 46, 45, 0.28);
+  color: var(--hearth);
 }
 
 .kw-toggle__btn--active {
@@ -487,9 +511,41 @@ body {
   background: rgba(232, 155, 79, 0.12);
   color: var(--ember);
 }
+.kw-toggle__btn--active:hover:not(:disabled) {
+  background: rgba(232, 155, 79, 0.18);
+}
 
 .kw-toggle__btn:disabled {
   opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Dispatch nav buttons — prominent per DESIGN.md */
+.kw-dispatch-btn {
+  padding: 8px 18px;
+  border: 1px solid rgba(31, 58, 52, 0.25);
+  border-radius: var(--r-12);
+  background: transparent;
+  color: var(--hearth);
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--t-state) var(--ease),
+              border-color var(--t-state) var(--ease);
+  user-select: none;
+}
+.kw-dispatch-btn:hover:not(:disabled) {
+  background: rgba(31, 58, 52, 0.06);
+  border-color: var(--hearth);
+}
+.kw-dispatch-btn--active {
+  background: var(--hearth);
+  color: var(--bone);
+  border-color: var(--hearth);
+}
+.kw-dispatch-btn:disabled {
+  opacity: 0.35;
   cursor: not-allowed;
 }
 

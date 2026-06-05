@@ -14,7 +14,7 @@ describe("HonestyPage", () => {
     render(<HonestyPage />);
     expect(screen.getByRole("link", { name: "Methodology" })).toHaveAttribute(
       "href",
-      "/methodology.html",
+      "./methodology.html",
     );
   });
 });

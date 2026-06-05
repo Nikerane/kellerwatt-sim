@@ -55,7 +55,7 @@ describe("PlaygroundPage", () => {
     render(<PlaygroundPage />);
     expect(screen.getByRole("link", { name: "Playground" })).toHaveAttribute(
       "href",
-      "/playground.html",
+      "./playground.html",
     );
   });
 
@@ -77,12 +77,13 @@ describe("PlaygroundPage", () => {
     expect(await screen.findByText(/Ready/, {}, { timeout: 2000 })).toBeInTheDocument();
   });
 
-  it("renders daily dispatch section with nav controls", () => {
+  it("renders daily dispatch section with day buttons", () => {
     render(<PlaygroundPage />);
     expect(screen.getByText(/Daily dispatch/)).toBeInTheDocument();
     expect(screen.getByText(/Best Day/)).toBeInTheDocument();
     expect(screen.getByText(/Worst Day/)).toBeInTheDocument();
-    const dateInput = document.querySelector('input[type="date"]');
-    expect(dateInput).toBeInTheDocument();
+    expect(screen.getByText("Mar 21")).toBeInTheDocument();
+    expect(screen.getByText("Jun 21")).toBeInTheDocument();
+    expect(screen.getByText("Jan 15")).toBeInTheDocument();
   });
 });

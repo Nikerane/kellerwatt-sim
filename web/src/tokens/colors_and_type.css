@@ -12,6 +12,7 @@
   --dusk: #4a3850; /* depth, off-peak, shadows */
   --clay-red: #d98a7a; /* NEGATIVE VALUES ONLY */
   --app-surface: #101d18; /* owner-app dark surface */
+  --border: rgba(44, 46, 45, 0.14); /* slider tracks, button rims */
 
   /* type */
   --serif: "Fraunces Variable", Fraunces, Georgia, serif;
