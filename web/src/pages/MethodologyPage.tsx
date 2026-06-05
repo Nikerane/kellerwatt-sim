@@ -95,9 +95,9 @@ export function MethodologyPage() {
         <div className="kw-section__inner">
           <Eyebrow>How the real numbers are computed</Eyebrow>
           <p className="kw-lead" style={{ marginTop: 18, marginBottom: 24 }}>
-            The validated best-case and realistic figures come from running a
-            mixed-integer linear program (MILP) on real Energy-Charts day-ahead
-            prices across {YEARS.length} years.
+            The validated best-case and realistic figures come from running{" "}
+            <strong>HiGHS</strong> — an open-source linear optimisation solver —
+            on real Energy-Charts day-ahead prices across {YEARS.length} years.
           </p>
 
           <div style={{ display: "grid", gap: 16 }}>

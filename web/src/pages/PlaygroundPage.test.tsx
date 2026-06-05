@@ -70,10 +70,11 @@ describe("PlaygroundPage", () => {
     expect(screen.getByText("300 kWh")).toBeInTheDocument();
   });
 
-  it("shows ready status after health check resolves", async () => {
+  it("renders the Compute button", () => {
     render(<PlaygroundPage />);
-    // Engine URL is set, so it starts as "warming" but the mocked health check
-    // should transition to "Ready" after the poll resolves.
-    expect(await screen.findByText(/Ready/, {}, { timeout: 2000 })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Compute" }),
+    ).toBeInTheDocument();
   });
+});
 });

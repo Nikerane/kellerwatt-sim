@@ -11,7 +11,6 @@ import { results as defaultResults } from "../data/load";
 import { YEARS } from "../data/load";
 
 // ------- engine URL (HF Space) ----------
-// When running locally without the HF backend, leave empty to use baked-in defaults.
 const ENGINE_URL = "https://nikerane-kellerwatt-engine.hf.space";
 
 // ------- slider definitions ----------
@@ -21,7 +20,7 @@ const SLIDERS: SliderDef[] = [
     label: "Battery capacity",
     min: 50,
     max: 350,
-    step: 25,
+    step: 50,
     default: 200,
     unit: "kWh",
   },
@@ -30,7 +29,7 @@ const SLIDERS: SliderDef[] = [
     label: "Power rating",
     min: 25,
     max: 250,
-    step: 25,
+    step: 50,
     default: 50,
     unit: "kW",
   },
@@ -58,7 +57,7 @@ const SLIDERS: SliderDef[] = [
     label: "Daily cycle cap",
     min: 0.5,
     max: 3.0,
-    step: 0.25,
+    step: 0.5,
     default: 1.5,
     unit: "cyc/day",
   },
@@ -73,10 +72,10 @@ const SLIDERS: SliderDef[] = [
   },
 ];
 
-type EngineStatus = "warming" | "ready" | "solving" | "solved" | "error";
+type ComputeStatus = "idle" | "computing" | "error";
 
 /** Build default SolveResponse from the baked-in sim_results.json so the page
-    shows real numbers before the backend wakes up. */
+    shows real numbers before the first compute. */
 function defaultSolveResponse(): SolveResponse {
   const bp = defaultResults.assumptions.business_plan;
   const years = defaultResults.provenance.years;
@@ -142,101 +141,61 @@ export function PlaygroundPage() {
   );
   const [exemption, setExemption] = useState<"retained" | "lost">("retained");
   const [response, setResponse] = useState<SolveResponse>(defaultSolveResponse);
-  const [engineStatus, setEngineStatus] = useState<EngineStatus>(
-    ENGINE_URL ? "warming" : "ready",
-  );
+  const [status, setStatus] = useState<ComputeStatus>("idle");
   const latest = Math.max(...YEARS);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const healthPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const mountedRef = useRef(true);
 
-  // ------ health-check warm-up on mount ------
   useEffect(() => {
     mountedRef.current = true;
-    if (!ENGINE_URL) {
-      setEngineStatus("ready");
-      return;
-    }
-    let attempts = 0;
-    const poll = () => {
-      fetch(`${ENGINE_URL}/health`)
-        .then((r) => {
-          if (r.ok && mountedRef.current) {
-            setEngineStatus("ready");
-            if (healthPollRef.current) clearInterval(healthPollRef.current);
-          }
-        })
-        .catch(() => {
-          /* still warming */
-        });
-      attempts++;
-      if (attempts > 12) {
-        // 60s timeout — engine didn't come up
-        if (healthPollRef.current) clearInterval(healthPollRef.current);
-        if (mountedRef.current) setEngineStatus("error");
-      }
-    };
-    poll(); // immediate first attempt
-    healthPollRef.current = setInterval(poll, 5000);
-    return () => {
-      mountedRef.current = false;
-      if (healthPollRef.current) clearInterval(healthPollRef.current);
-    };
+    return () => { mountedRef.current = false; };
   }, []);
 
-  // ------ debounced solve ------
-  const solve = useCallback(
-    (vals: Record<string, number>, exc: "retained" | "lost") => {
-      if (!ENGINE_URL) return;
-      if (timerRef.current) clearTimeout(timerRef.current);
-      timerRef.current = setTimeout(async () => {
-        setEngineStatus("solving");
-        try {
-          const res = await fetch(`${ENGINE_URL}/solve`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              battery: {
-                capacity_kwh: vals.capacity_kwh,
-                power_kw: vals.power_kw,
-                rte: vals.rte,
-              },
-              assumed_spread_eur_mwh: vals.assumed_spread,
-              cycles_per_day: vals.cycles_per_day,
-              grid_fee_eur_mwh: vals.grid_fee,
-              exemption: exc,
-            }),
-          });
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          const data: SolveResponse = await res.json();
-          if (mountedRef.current) {
-            setResponse(data);
-            setEngineStatus("solved");
-          }
-        } catch {
-          if (mountedRef.current) setEngineStatus("error");
-        }
-      }, 500);
-    },
-    [],
-  );
+  // ------ compute (manual trigger) ------
+  const compute = useCallback(async () => {
+    if (!ENGINE_URL) return;
+    setStatus("computing");
+    try {
+      const res = await fetch(`${ENGINE_URL}/solve`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          battery: {
+            capacity_kwh: values.capacity_kwh,
+            power_kw: values.power_kw,
+            rte: values.rte,
+          },
+          assumed_spread_eur_mwh: values.assumed_spread,
+          cycles_per_day: values.cycles_per_day,
+          grid_fee_eur_mwh: values.grid_fee,
+          exemption,
+        }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data: SolveResponse = await res.json();
+      if (mountedRef.current) {
+        setResponse(data);
+        setStatus("idle");
+      }
+    } catch {
+      if (mountedRef.current) setStatus("error");
+    }
+  }, [values, exemption]);
 
   const handleSlider = useCallback(
     (key: string, value: number) => {
-      const next = { ...values, [key]: value };
-      setValues(next);
-      solve(next, exemption);
+      setValues((prev) => ({ ...prev, [key]: value }));
     },
-    [values, exemption, solve],
+    [],
   );
 
   const handleExemption = useCallback(
     (exc: "retained" | "lost") => {
       setExemption(exc);
-      solve(values, exc);
     },
-    [values, solve],
+    [],
   );
+
+  const isComputing = status === "computing";
 
   return (
     <main className="kw-page">
@@ -257,8 +216,9 @@ export function PlaygroundPage() {
             />
           </div>
           <p className="kw-lead kw-fade kw-fade--3" style={{ marginTop: 28 }}>
-            Every slider change re-runs the Python arbitrage engine live — the same
-            solver, the same real DE-LU prices. Results appear in seconds.
+            Tweak the sliders, then hit Compute. HiGHS — an open-source
+            optimisation solver — finds the best charge/discharge schedule against
+            real DE-LU day-ahead prices.
           </p>
         </div>
       </section>
@@ -267,13 +227,10 @@ export function PlaygroundPage() {
       <section className="kw-section kw-section--bone kw-section--tight">
         <div className="kw-section__inner">
           <div
-            style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 28 }}
+            style={{ display: "flex", alignItems: "baseline", gap: 16, marginBottom: 28, flexWrap: "wrap" }}
           >
             <Eyebrow>Parameters</Eyebrow>
-            <EngineBadge
-              status={engineStatus}
-              onRetry={() => solve(values, exemption)}
-            />
+            <ComputeButton status={status} onClick={compute} />
           </div>
           <div
             className="kw-sliders-grid"
@@ -289,7 +246,7 @@ export function PlaygroundPage() {
                 slider={s}
                 value={values[s.key]}
                 onChange={handleSlider}
-                disabled={engineStatus === "solving"}
+                disabled={isComputing}
               />
             ))}
             {/* exemption toggle */}
@@ -311,7 +268,7 @@ export function PlaygroundPage() {
                   type="button"
                   className={`kw-toggle__btn ${exemption === "retained" ? "kw-toggle__btn--active" : ""}`}
                   onClick={() => handleExemption("retained")}
-                  disabled={engineStatus === "solving"}
+                  disabled={isComputing}
                 >
                   Retained
                 </button>
@@ -319,7 +276,7 @@ export function PlaygroundPage() {
                   type="button"
                   className={`kw-toggle__btn ${exemption === "lost" ? "kw-toggle__btn--active" : ""}`}
                   onClick={() => handleExemption("lost")}
-                  disabled={engineStatus === "solving"}
+                  disabled={isComputing}
                 >
                   Lost
                 </button>
@@ -332,7 +289,7 @@ export function PlaygroundPage() {
       {/* Results table */}
       <section className="kw-section kw-section--bone">
         <div className="kw-section__inner">
-          <Eyebrow ember>Results — live solved</Eyebrow>
+          <Eyebrow ember>Results</Eyebrow>
           <div style={{ overflowX: "auto" }}>
             <PlaygroundResults data={response} year={latest} />
           </div>
@@ -349,8 +306,7 @@ export function PlaygroundPage() {
       <footer className="kw-footer">
         <Eyebrow>How this works</Eyebrow>
         <p style={{ marginTop: 14 }}>
-          Every slider change sends your battery specs to a Python program running
-          HiGHS — an open-source optimisation solver. It reads real DE-LU day-ahead
+          HiGHS — an open-source optimisation solver — reads real DE-LU day-ahead
           prices from Energy-Charts and finds the best possible charge/discharge
           schedule for each day. Best-case assumes perfect knowledge of tomorrow's
           prices. Realistic uses only past data, like a real operator would.
@@ -360,69 +316,47 @@ export function PlaygroundPage() {
   );
 }
 
-function EngineBadge({
-  status,
-  onRetry,
-}: {
-  status: EngineStatus;
-  onRetry: () => void;
-}) {
-  const config: Record<
-    EngineStatus,
-    { text: string; dot: string }
-  > = {
-    warming: { text: "Warming up…", dot: "var(--ember)" },
-    ready: { text: "Ready ✓", dot: "#4CAF50" },
-    solving: { text: "Solving…", dot: "var(--ember)" },
-    solved: { text: "Solved ✓", dot: "#4CAF50" },
-    error: { text: "Unreachable", dot: "var(--clay-red)" },
-  };
-  const c = config[status];
+function ComputeButton({ status, onClick }: { status: ComputeStatus; onClick: () => void }) {
   const isError = status === "error";
 
   return (
-    <span
-      role="status"
-      aria-live="polite"
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: 6,
-        fontSize: "0.78rem",
-        fontFamily: "var(--mono)",
-        color: c.dot,
-      }}
-    >
-      <span
-        style={{
-          width: 8,
-          height: 8,
-          borderRadius: "50%",
-          backgroundColor: c.dot,
-          animation:
-            status === "warming" || status === "solving"
-              ? "kw-pulse 1.4s ease-in-out infinite"
-              : undefined,
-        }}
-      />
-      {c.text}
+    <span style={{ display: "inline-flex", alignItems: "center", gap: 10 }}>
+      <button
+        type="button"
+        className="kw-dispatch-btn kw-dispatch-btn--active"
+        onClick={onClick}
+        disabled={status === "computing"}
+        style={{ fontSize: "0.82rem", fontFamily: "var(--mono)" }}
+      >
+        {status === "computing" ? "Computing…" : "Compute"}
+      </button>
       {isError && (
-        <button
-          type="button"
-          onClick={onRetry}
+        <span
+          role="status"
           style={{
-            marginLeft: 6,
-            background: "none",
-            border: "1px solid var(--clay-red)",
+            fontSize: "0.78rem",
+            fontFamily: "var(--mono)",
             color: "var(--clay-red)",
-            borderRadius: 4,
-            cursor: "pointer",
-            fontSize: "0.72rem",
-            padding: "1px 6px",
           }}
         >
-          Retry
-        </button>
+          Failed —{" "}
+          <button
+            type="button"
+            onClick={onClick}
+            style={{
+              background: "none",
+              border: "none",
+              color: "var(--clay-red)",
+              cursor: "pointer",
+              textDecoration: "underline",
+              fontSize: "inherit",
+              fontFamily: "inherit",
+              padding: 0,
+            }}
+          >
+            try again
+          </button>
+        </span>
       )}
     </span>
   );
