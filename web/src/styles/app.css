@@ -292,6 +292,20 @@ body {
   stroke-width: 2;
   fill: none;
 }
+
+/* Chart on Bone background — flip light strokes to dark */
+.kw-section--bone .kw-chart__axis {
+  fill: rgba(44, 46, 45, 0.55);
+}
+.kw-section--bone .kw-chart__grid {
+  stroke: rgba(44, 46, 45, 0.1);
+}
+.kw-section--bone .kw-chart__assumed {
+  stroke: rgba(44, 46, 45, 0.45);
+}
+.kw-section--bone .kw-chart__causal {
+  stroke: rgba(44, 46, 45, 0.75);
+}
 .kw-chart__bracket {
   fill: rgba(232, 155, 79, 0.1);
 }

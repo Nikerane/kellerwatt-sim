@@ -29,7 +29,7 @@ export function PlaygroundSlider({ slider, value, onChange, disabled }: Props) {
         className="kw-slider__label"
         style={{ display: "flex", justifyContent: "space-between" }}
       >
-        <span style={{ fontFamily: "var(--sans)", fontSize: "0.85rem", color: "var(--slate)" }}>
+        <span style={{ fontFamily: "var(--sans)", fontSize: "0.85rem" }}>
           {slider.label}
         </span>
         <DataMono tone="ember" size="sm">
