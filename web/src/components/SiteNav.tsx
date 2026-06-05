@@ -1,5 +1,5 @@
 /** Cross-page navigation between the honesty page and the methodology page. */
-export function SiteNav({ current }: { current: "honesty" | "methodology" }) {
+export function SiteNav({ current }: { current: "honesty" | "methodology" | "playground" }) {
   return (
     <nav className="kw-nav" aria-label="Primary">
       <a className="kw-nav__brand" href="/index.html">KellerWatt</a>
@@ -9,6 +9,9 @@ export function SiteNav({ current }: { current: "honesty" | "methodology" }) {
         </a>
         <a aria-current={current === "methodology" ? "page" : undefined} href="/methodology.html">
           Methodology
+        </a>
+        <a aria-current={current === "playground" ? "page" : undefined} href="/playground.html">
+          Playground
         </a>
       </span>
     </nav>

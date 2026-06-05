@@ -1,0 +1,6 @@
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+pulp==3.3.2
+highspy==1.14.0
+numpy==2.4.6
+numpy-financial==1.0.0

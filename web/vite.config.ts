@@ -13,6 +13,7 @@ export default defineConfig({
       input: {
         main: `${root}index.html`,
         methodology: `${root}methodology.html`,
+        playground: `${root}playground.html`,
       },
     },
   },
