@@ -84,10 +84,8 @@ export function MethodologyPage() {
           </div>
 
           <p className="kw-lead" style={{ marginTop: 20, opacity: 0.7, fontSize: "0.92rem" }}>
-            The implied spread works backwards from the deck's claimed €9,947 —
-            but that figure requires <DataMono tone="muted">€{(9947 / (usable * cyclesPerDay * days / 1000)).toFixed(1)}/MWh</DataMono>,
-            not €80. The <DataMono tone="ember">€{bp.assumed_spread_eur_mwh}</DataMono> assumed
-            spread yields <DataMono tone="ember">€{Math.round(bp.assumed_gross_eur).toLocaleString()}</DataMono>.
+            At €{bp.assumed_spread_eur_mwh}/MWh assumed, that works out to{" "}
+            <DataMono tone="ember">€{Math.round(bp.assumed_gross_eur).toLocaleString()}</DataMono> a year.
           </p>
         </div>
       </section>
