@@ -73,9 +73,13 @@ def cashflow_during_negative_intervals(
 
 
 def project_irr(capex_eur, annual_ebitda_eur, years) -> dict:
-    """Constant-EBITDA project IRR — provisional (Codex 13). Null until a real
-    annual cashflow model (degradation, replacement, terminal value) and the
-    diligence inputs (#8 fee basis, #9 grid-fee value) exist."""
+    """UNLEVERED (all-equity) constant-EBITDA project IRR — provisional (Codex 13).
+
+    IRR([-capex, ebitda, ...]) carries no debt: a levered/equity IRR needs a
+    financing structure (debt fraction, rate, tenor) and would typically be higher
+    under positive leverage. Null until a real annual cashflow model (degradation,
+    replacement, terminal value) and the diligence inputs (#8 fee basis, #9
+    grid-fee value) exist."""
     if capex_eur is None or annual_ebitda_eur is None or years is None:
         value = None
     else:
@@ -83,7 +87,7 @@ def project_irr(capex_eur, annual_ebitda_eur, years) -> dict:
         irr = npf.irr(cashflows)
         value = None if irr is None or (irr != irr) else float(irr)  # NaN-safe
     return contracts.metric(
-        value, "ratio", "constant-EBITDA project IRR", contracts.STATUS_PROVISIONAL
+        value, "ratio", "unlevered constant-EBITDA project IRR", contracts.STATUS_PROVISIONAL
     )
 
 
@@ -94,5 +98,5 @@ def simple_payback(capex_eur, annual_ebitda_eur) -> dict:
     else:
         value = float(capex_eur) / float(annual_ebitda_eur)
     return contracts.metric(
-        value, "years", "constant-EBITDA payback", contracts.STATUS_PROVISIONAL
+        value, "years", "unlevered constant-EBITDA payback", contracts.STATUS_PROVISIONAL
     )

@@ -9,8 +9,8 @@
       2024,
       2025
     ],
-    "generated_utc": "2026-06-05T05:11:16Z",
-    "git_commit": "f9d3c3d54ceadd92061c514987b5b0cae8bcffe5",
+    "generated_utc": "2026-06-05T08:26:49Z",
+    "git_commit": "66db614c0e245af5cc67d4e44a3369c62e5b4e8f",
     "note": "Ceilings are perfect-foresight upper bounds on real DE-LU prices. Causal is a backtested estimate, not a floor. Deck claimed EUR 9,947 gross; reconciled identity at EUR 80/MWh, 1.5 cyc = EUR 7,884 (Codex 7)."
   },
   "solver": {
@@ -140,13 +140,13 @@
       "irr": {
         "value": null,
         "unit": "ratio",
-        "methodology_label": "constant-EBITDA project IRR",
+        "methodology_label": "unlevered constant-EBITDA project IRR",
         "status": "provisional"
       },
       "payback_years": {
         "value": null,
         "unit": "years",
-        "methodology_label": "constant-EBITDA payback",
+        "methodology_label": "unlevered constant-EBITDA payback",
         "status": "provisional"
       }
     },
@@ -164,13 +164,13 @@
       "irr": {
         "value": null,
         "unit": "ratio",
-        "methodology_label": "constant-EBITDA project IRR",
+        "methodology_label": "unlevered constant-EBITDA project IRR",
         "status": "provisional"
       },
       "payback_years": {
         "value": null,
         "unit": "years",
-        "methodology_label": "constant-EBITDA payback",
+        "methodology_label": "unlevered constant-EBITDA payback",
         "status": "provisional"
       }
     }

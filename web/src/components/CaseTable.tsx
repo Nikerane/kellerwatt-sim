@@ -144,7 +144,7 @@ export function CaseTable({ year }: { year: number }) {
         <tr>
           <th scope="row">
             Project IRR
-            <span className="kw-table__row-note">constant-EBITDA</span>
+            <span className="kw-table__row-note">unlevered · constant-EBITDA</span>
           </th>
           {cols.map((c) => (
             <td key={c.key} className={valCls(c)}>
