@@ -31,6 +31,7 @@ class StrategyYear:
     simul_max: float
     implied_spread: float
     traded_days: int | None = None  # causal only; None for the always-on ceiling
+    neg_price_cashflow_eur: float | None = None  # ceiling only (Codex 12)
 
 
 @dataclass(frozen=True)
@@ -51,6 +52,7 @@ def aggregate_ceiling(days, battery: Battery, year: int, day_count: int) -> Stra
     sale = sum(d.sale_turnover_eur for d in days)
     purchase = sum(d.purchase_turnover_eur for d in days)
     simul = max((d.simul_max for d in days), default=0.0)
+    neg_cf = sum(d.neg_price_cashflow_eur for d in days)
     return StrategyYear(
         year=year,
         day_count=day_count,
@@ -63,6 +65,7 @@ def aggregate_ceiling(days, battery: Battery, year: int, day_count: int) -> Stra
         cycles_cell=cycles_cell(mdis, battery.usable_mwh, day_count, battery.eta_one_way),
         simul_max=simul,
         implied_spread=implied_spread(gross, mdis),
+        neg_price_cashflow_eur=neg_cf,
     )
 
 
@@ -95,6 +98,7 @@ def _ceiling_signature(battery: Battery, cycle_cap, grid_fee, deg, tiebreak) -> 
         "cap_kwh": battery.capacity_kwh, "power": battery.power_kw,
         "smin": battery.soc_min_frac, "smax": battery.soc_max_frac, "rte": battery.rte,
         "cycle_cap": cycle_cap, "grid_fee": grid_fee, "deg": deg, "tie": tiebreak,
+        "cache_v": 2,  # bumped when the cached row schema changes (neg_cf added)
     }, sort_keys=True)
     return hashlib.sha256(payload.encode()).hexdigest()[:16]
 
@@ -109,6 +113,7 @@ def _solve_ceiling_days(year_data: YearData, battery: Battery, *, cycle_cap, gri
             dispatch.DayDispatch(
                 gross_eur=r["gross"], mwh_discharged=r["dis"], mwh_charged=r["chg"],
                 sale_turnover_eur=r["sale"], purchase_turnover_eur=r["purchase"],
+                neg_price_cashflow_eur=r.get("neg_cf", 0.0),
                 simul_max=r["simul"], status="Optimal",
                 charge_kw=(), discharge_kw=(), soc_kwh=(), soc_init_kwh=0.0,
             )
@@ -125,7 +130,8 @@ def _solve_ceiling_days(year_data: YearData, battery: Battery, *, cycle_cap, gri
         days.append(r)
         rows.append({"gross": r.gross_eur, "dis": r.mwh_discharged,
                      "chg": r.mwh_charged, "sale": r.sale_turnover_eur,
-                     "purchase": r.purchase_turnover_eur, "simul": r.simul_max})
+                     "purchase": r.purchase_turnover_eur, "simul": r.simul_max,
+                     "neg_cf": r.neg_price_cashflow_eur})
     if use_cache:
         CACHE_DIR.mkdir(parents=True, exist_ok=True)
         cache_path.write_text(json.dumps(rows))

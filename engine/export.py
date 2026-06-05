@@ -47,6 +47,7 @@ def _year_result(sy, *, is_ceiling):
         "mwh_discharged": _round(sy.mwh_discharged, 2),
         "day_count": sy.day_count,
         "simul_max": _round(sy.simul_max, 9),
+        "neg_price_cashflow_eur": _round(getattr(sy, "neg_price_cashflow_eur", None), 0),
     }
 
 
@@ -151,6 +152,16 @@ def build_results(bt_result, params: Params, *, generated_utc: str,
             _scenario(scn, all_days, params, representative_year=representative_year,
                       capex_eur=capex_eur)
             for scn in economics.SCENARIOS
+        ],
+        "market": [
+            {
+                "year": y,
+                "negative_intervals": bt_result.year_data[y].negative_intervals,
+                "price_min": round(bt_result.year_data[y].price_min, 1),
+                "price_max": round(bt_result.year_data[y].price_max, 1),
+                "day_count": bt_result.year_data[y].day_count,
+            }
+            for y in years
         ],
     }
     Draft202012Validator(json.loads(SCHEMA_PATH.read_text())).validate(doc)

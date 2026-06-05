@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0.0",
+  "schema_version": "1.1.0",
   "provenance": {
     "price_zone": "DE-LU",
     "data_source": "Energy-Charts",
@@ -9,8 +9,8 @@
       2024,
       2025
     ],
-    "generated_utc": "2026-06-05T08:26:49Z",
-    "git_commit": "66db614c0e245af5cc67d4e44a3369c62e5b4e8f",
+    "generated_utc": "2026-06-05T08:54:54Z",
+    "git_commit": "0bc97e848de57305c92f268a0af0ea63e0f7aeb1",
     "note": "Ceilings are perfect-foresight upper bounds on real DE-LU prices. Causal is a backtested estimate, not a floor. Deck claimed EUR 9,947 gross; reconciled identity at EUR 80/MWh, 1.5 cyc = EUR 7,884 (Codex 7)."
   },
   "solver": {
@@ -58,7 +58,8 @@
           "gross_eur": 5403.0,
           "mwh_discharged": 88.48,
           "day_count": 365,
-          "simul_max": 0.0
+          "simul_max": 0.0,
+          "neg_price_cashflow_eur": 156.0
         },
         {
           "year": 2024,
@@ -69,7 +70,8 @@
           "gross_eur": 6148.0,
           "mwh_discharged": 89.95,
           "day_count": 366,
-          "simul_max": 0.0
+          "simul_max": 0.0,
+          "neg_price_cashflow_eur": 213.0
         },
         {
           "year": 2025,
@@ -80,7 +82,8 @@
           "gross_eur": 7030.0,
           "mwh_discharged": 90.95,
           "day_count": 365,
-          "simul_max": 0.0
+          "simul_max": 0.0,
+          "neg_price_cashflow_eur": 274.0
         }
       ]
     },
@@ -98,7 +101,8 @@
           "gross_eur": 1711.0,
           "mwh_discharged": 45.53,
           "day_count": 365,
-          "simul_max": 0.0
+          "simul_max": 0.0,
+          "neg_price_cashflow_eur": null
         },
         {
           "year": 2024,
@@ -109,7 +113,8 @@
           "gross_eur": 2352.0,
           "mwh_discharged": 45.77,
           "day_count": 366,
-          "simul_max": 0.0
+          "simul_max": 0.0,
+          "neg_price_cashflow_eur": null
         },
         {
           "year": 2025,
@@ -120,7 +125,8 @@
           "gross_eur": 3272.0,
           "mwh_discharged": 56.96,
           "day_count": 365,
-          "simul_max": 0.0
+          "simul_max": 0.0,
+          "neg_price_cashflow_eur": null
         }
       ]
     }
@@ -173,6 +179,29 @@
         "methodology_label": "unlevered constant-EBITDA payback",
         "status": "provisional"
       }
+    }
+  ],
+  "market": [
+    {
+      "year": 2023,
+      "negative_intervals": 301,
+      "price_min": -500.0,
+      "price_max": 524.3,
+      "day_count": 365
+    },
+    {
+      "year": 2024,
+      "negative_intervals": 457,
+      "price_min": -135.4,
+      "price_max": 936.3,
+      "day_count": 366
+    },
+    {
+      "year": 2025,
+      "negative_intervals": 724,
+      "price_min": -250.3,
+      "price_max": 583.4,
+      "day_count": 365
     }
   ]
 }

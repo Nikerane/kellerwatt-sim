@@ -22,6 +22,7 @@ from typing import Sequence
 import numpy as np
 import pulp
 
+from engine.metrics import cashflow_during_negative_intervals
 from engine.params import Battery
 from engine.solver import solve_or_raise
 
@@ -63,6 +64,7 @@ class DayDispatch:
     discharge_kw: tuple
     soc_kwh: tuple
     soc_init_kwh: float
+    neg_price_cashflow_eur: float = 0.0  # cashflow during negative-price intervals (Codex 12)
 
 
 def solve_day_ceiling(
@@ -121,12 +123,14 @@ def solve_day_ceiling(
     mwh_dis = sum(dv[t] * dt_h for t in range(T)) / 1000.0
     mwh_chg = sum(cv[t] * dt_h for t in range(T)) / 1000.0
     simul = max((min(cv[t], dv[t]) for t in range(T)), default=0.0)
+    neg_cf = cashflow_during_negative_intervals(prices, cv, dv, dt_h)
     return DayDispatch(
         gross_eur=gross,
         mwh_discharged=mwh_dis,
         mwh_charged=mwh_chg,
         sale_turnover_eur=sale,
         purchase_turnover_eur=purchase,
+        neg_price_cashflow_eur=neg_cf,
         simul_max=simul,
         status="Optimal",
         charge_kw=tuple(cv),

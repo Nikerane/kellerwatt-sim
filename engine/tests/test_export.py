@@ -133,3 +133,10 @@ def test_write_artifacts_emits_both(tmp_path, results, schema):
     Draft202012Validator(schema).validate(real)
     Draft202012Validator(schema).validate(san)
     assert paths["real"].name == "sim_results.json"
+
+
+def test_export_emits_neg_cashflow_and_market(results):
+    ceiling = next(s for s in results["strategies"] if s["id"] == "lp_ceiling")
+    assert all("neg_price_cashflow_eur" in yr for yr in ceiling["years"])
+    assert isinstance(results["market"], list)
+    assert results["market"][0]["year"] in (2023, 2024, 2025)

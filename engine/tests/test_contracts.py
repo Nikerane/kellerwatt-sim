@@ -83,3 +83,16 @@ def test_schema_rejects_bad_metric_status(schema):
     doc["scenarios"][0]["irr"]["status"] = "totally_firm"
     with pytest.raises(ValidationError):
         Draft202012Validator(schema).validate(doc)
+
+
+def test_schema_version_is_1_1_0():
+    assert contracts.SCHEMA_VERSION == "1.1.0"
+
+
+def test_year_result_requires_neg_price_cashflow(schema):
+    assert "neg_price_cashflow_eur" in schema["$defs"]["year_result"]["required"]
+
+
+def test_market_block_in_schema_and_example(schema):
+    assert "market" in schema["properties"]
+    Draft202012Validator(schema).validate(contracts.minimal_example())

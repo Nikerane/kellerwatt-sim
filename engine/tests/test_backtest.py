@@ -74,3 +74,10 @@ def test_real_backtest_one_year_matches_validated_ceiling():
     assert sy.simul_max < 1e-6
     # Causal is a (lower) benchmark, reported as an estimate.
     assert res.causal[2024].gross_eur < sy.gross_eur
+
+
+def test_aggregate_ceiling_sums_neg_price_cashflow():
+    b = Battery()
+    days = [_fake_day(100.0, 1.0, 1.1, 120.0, 20.0), _fake_day(50.0, 0.5, 0.55, 60.0, 10.0)]
+    sy = bt.aggregate_ceiling(days, b, year=2024, day_count=2)
+    assert sy.neg_price_cashflow_eur == pytest.approx(0.0)

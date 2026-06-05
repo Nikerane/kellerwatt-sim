@@ -5,7 +5,7 @@
   "description": "Wire format for the arbitrage engine output. Every reported metric carries a methodology_label and a status (validated|estimate|provisional). The lp_ceiling strategy is the only validated figure; causal_walkforward is an estimate; IRR/payback are provisional pending external diligence.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "provenance", "solver", "assumptions", "strategies", "scenarios"],
+  "required": ["schema_version", "provenance", "solver", "assumptions", "strategies", "scenarios", "market"],
   "properties": {
     "schema_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
     "provenance": {
@@ -86,9 +86,26 @@
       "type": "array",
       "minItems": 1,
       "items": {"$ref": "#/$defs/scenario"}
+    },
+    "market": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/market_year"}
     }
   },
   "$defs": {
+    "market_year": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["year", "negative_intervals", "price_min", "price_max", "day_count"],
+      "properties": {
+        "year": {"type": "integer"},
+        "negative_intervals": {"type": "integer"},
+        "price_min": {"type": "number"},
+        "price_max": {"type": "number"},
+        "day_count": {"type": "integer"}
+      }
+    },
     "status": {
       "enum": ["validated", "estimate", "provisional"]
     },
@@ -109,7 +126,7 @@
     "year_result": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["year", "ceiling_eur_mwh", "causal_eur_mwh", "cycles_ac", "cycles_cell", "gross_eur", "mwh_discharged", "day_count", "simul_max"],
+      "required": ["year", "ceiling_eur_mwh", "causal_eur_mwh", "cycles_ac", "cycles_cell", "gross_eur", "mwh_discharged", "day_count", "simul_max", "neg_price_cashflow_eur"],
       "properties": {
         "year": {"type": "integer"},
         "ceiling_eur_mwh": {"type": ["number", "null"]},
@@ -119,7 +136,8 @@
         "gross_eur": {"type": ["number", "null"]},
         "mwh_discharged": {"type": ["number", "null"]},
         "day_count": {"type": "integer"},
-        "simul_max": {"type": ["number", "null"]}
+        "simul_max": {"type": ["number", "null"]},
+        "neg_price_cashflow_eur": {"type": ["number", "null"]}
       }
     },
     "strategy": {

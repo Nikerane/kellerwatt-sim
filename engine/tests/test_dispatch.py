@@ -121,3 +121,12 @@ def test_causal_uses_only_prior_days_thresholds():
                                           soc_init=b.soc_min_kwh)
     assert res.days[0].soc_start_kwh == pytest.approx(b.soc_min_kwh)
     assert res.gross_eur > 0
+
+
+def test_ceiling_reports_negative_price_cashflow():
+    # Charge while paid (negative price), discharge when expensive.
+    prices = [-100.0] * 4 + [200.0] * 4
+    r = dispatch.solve_day_ceiling(prices, dt_h=1.0, battery=Battery(), cycle_cap=1.5)
+    assert r.neg_price_cashflow_eur > 0.0  # charging at -100 EARNS during neg intervals
+    empty = dispatch.solve_day_ceiling([], 1.0, Battery(), cycle_cap=1.5)
+    assert empty.neg_price_cashflow_eur == 0.0

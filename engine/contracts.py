@@ -8,7 +8,7 @@ mirrors these enums; ``test_contracts.py`` asserts they never drift apart.
 """
 from __future__ import annotations
 
-SCHEMA_VERSION = "1.0.0"
+SCHEMA_VERSION = "1.1.0"
 
 # --- Strategy IDs (A0 / Codex 1,3) -------------------------------------------
 # lp_ceiling          : perfect-foresight LP upper bound — the ONLY validated figure.
@@ -123,8 +123,18 @@ def minimal_example():
                         "mwh_discharged": 90.0,
                         "day_count": 366,
                         "simul_max": 0.0,
+                        "neg_price_cashflow_eur": 120.0,
                     }
                 ],
+            }
+        ],
+        "market": [
+            {
+                "year": 2024,
+                "negative_intervals": 457,
+                "price_min": -135.4,
+                "price_max": 936.3,
+                "day_count": 366,
             }
         ],
         "scenarios": [
