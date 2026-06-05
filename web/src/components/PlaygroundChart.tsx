@@ -92,7 +92,7 @@ export function PlaygroundChart({ data }: Props) {
         />
         <text
           className="kw-chart__axis"
-          x={W - M.right}
+          x={W - M.right + 14}
           y={y(assumed) - 8}
           textAnchor="end"
         >
