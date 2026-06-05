@@ -145,25 +145,19 @@ export function HonestyPage() {
       </Section>
 
       <footer className="kw-footer">
-        <Eyebrow>Provenance</Eyebrow>
+        <Eyebrow>How this works</Eyebrow>
         <p style={{ marginTop: 14 }}>
-          {p.data_source} {p.price_zone} day-ahead prices, {p.years.join(" / ")}. Solver{" "}
-          <DataMono tone="muted" size="sm">
-            {results.solver.name} {results.solver.version}
-          </DataMono>
-          , status {results.solver.status}. Generated{" "}
-          <DataMono tone="muted" size="sm">
-            {p.generated_utc}
-          </DataMono>
-          {p.git_commit ? (
-            <>
-              {" "}
-              · build{" "}
-              <DataMono tone="muted" size="sm">
-                {p.git_commit.slice(0, 10)}
-              </DataMono>
-            </>
-          ) : null}
+          Every number on this page comes from running an optimisation solver
+          (HiGHS — open-source, industry-standard) on real {p.price_zone} day-ahead
+          electricity prices from {p.data_source}, {p.years.join(" / ")}. The solver
+          finds the profit-maximising charge/discharge schedule for each day given
+          the battery's specs. Best-case assumes perfect knowledge of tomorrow's
+          prices. Realistic uses only past data.
+        </p>
+        <p style={{ marginTop: 10, fontSize: "0.78rem", opacity: 0.55 }}>
+          Solver status: {results.solver.status}. Generated{" "}
+          {p.generated_utc}
+          {p.git_commit ? <> · build {p.git_commit.slice(0, 10)}</> : null}
           . Schema v{results.schema_version}. {p.note}
         </p>
       </footer>

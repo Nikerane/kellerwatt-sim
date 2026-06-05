@@ -116,17 +116,6 @@ export function PlaygroundChart({ data }: Props) {
             </text>
           </g>
         ))}
-        {causPts.map(([cx, cy], i) => (
-          <text
-            key={i}
-            className="kw-chart__axis"
-            x={cx}
-            y={cy + 20}
-            textAnchor="middle"
-          >
-            €{causal[i].toFixed(1)}
-          </text>
-        ))}
 
         {years.map((yr, i) => (
           <text

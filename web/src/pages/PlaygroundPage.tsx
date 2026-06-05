@@ -347,12 +347,13 @@ export function PlaygroundPage() {
       </section>
 
       <footer className="kw-footer">
-        <Eyebrow>Engine</Eyebrow>
+        <Eyebrow>How this works</Eyebrow>
         <p style={{ marginTop: 14 }}>
-          Same Python solver (HiGHS {defaultResults.solver.version}) on real DE-LU
-          day-ahead prices from Energy-Charts. Best-case is a perfect-information
-          upper bound. Realistic is a backtested estimate. IRR / payback stay null
-          until diligence items land.
+          Every slider change sends your battery specs to a Python program running
+          HiGHS — an open-source optimisation solver. It reads real DE-LU day-ahead
+          prices from Energy-Charts and finds the best possible charge/discharge
+          schedule for each day. Best-case assumes perfect knowledge of tomorrow's
+          prices. Realistic uses only past data, like a real operator would.
         </p>
       </footer>
     </main>
