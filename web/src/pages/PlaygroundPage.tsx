@@ -23,7 +23,6 @@ const SLIDERS: SliderDef[] = [
     step: 50,
     default: 200,
     unit: "kWh",
-    hint: "how much energy it stores",
   },
   {
     key: "power_kw",
@@ -33,7 +32,6 @@ const SLIDERS: SliderDef[] = [
     step: 50,
     default: 50,
     unit: "kW",
-    hint: "how fast it charges or sells",
   },
   {
     key: "rte",
@@ -44,7 +42,6 @@ const SLIDERS: SliderDef[] = [
     default: 0.90,
     unit: "%",
     formatValue: (v: number) => `${Math.round(v * 100)}%`,
-    hint: "energy kept after a charge + discharge",
   },
   {
     key: "assumed_spread",
@@ -54,7 +51,6 @@ const SLIDERS: SliderDef[] = [
     step: 5,
     default: 80,
     unit: "€/MWh",
-    hint: "the price gap the plan assumes",
   },
   {
     key: "cycles_per_day",
@@ -64,7 +60,6 @@ const SLIDERS: SliderDef[] = [
     step: 0.5,
     default: 1.5,
     unit: "cyc/day",
-    hint: "full charge-and-empty cycles a day",
   },
   {
     key: "grid_fee",
@@ -74,7 +69,6 @@ const SLIDERS: SliderDef[] = [
     step: 5,
     default: 0,
     unit: "€/MWh",
-    hint: "extra cost per MWh drawn",
   },
 ];
 
