@@ -55,7 +55,7 @@ describe("PlaygroundPage", () => {
     render(<PlaygroundPage />);
     expect(screen.getByRole("link", { name: "Playground" })).toHaveAttribute(
       "href",
-      "./playground.html",
+      "https://nikerane.github.io/kellerwatt-sim/playground.html",
     );
   });
 
