@@ -8,9 +8,7 @@ export function MethodologyPage() {
   const bp = results.assumptions.business_plan;
   const battery = results.assumptions.battery;
   const latest = Math.max(...YEARS);
-  // Derive the identity: spread × usable MWh × cycles × days = annual gross
   const cyclesPerDay = bp.assumed_cycles_per_day;
-  const days = 365;
   const usable = battery.usable_kwh;
 
   return (
@@ -50,39 +48,6 @@ export function MethodologyPage() {
             <StatCard label="Assumed spread" value={`€${bp.assumed_spread_eur_mwh}/MWh`} />
             <StatCard label="Solver" value={`${results.solver.name} ${results.solver.version}`} />
           </div>
-        </div>
-      </section>
-
-      {/* Revenue identity */}
-      <section className="kw-section kw-section--bone kw-section--tight">
-        <div className="kw-section__inner">
-          <Eyebrow>Revenue identity</Eyebrow>
-          <p className="kw-lead" style={{ marginTop: 18, marginBottom: 24 }}>
-            The assumed case is a simple multiplication — not a market simulation.
-            The formula is:
-          </p>
-
-          <div style={{
-            fontFamily: "var(--mono)", fontSize: "0.95rem",
-            background: "var(--paper)", padding: "20px 24px",
-            borderRadius: "var(--r-12)", border: "var(--hairline)",
-            lineHeight: 1.7,
-          }}>
-            <div>
-              gross = spread × usable_kWh × cycles_per_day × days ÷ 1000
-            </div>
-            <div style={{ marginTop: 8, opacity: 0.6 }}>
-              = {bp.assumed_spread_eur_mwh} × {usable} × {cyclesPerDay} × {days} ÷ 1000
-            </div>
-            <div style={{ marginTop: 4 }}>
-              = <DataMono tone="ember" size="lg">{Math.round(bp.assumed_gross_eur).toLocaleString()}</DataMono> gross per year
-            </div>
-          </div>
-
-          <p className="kw-lead" style={{ marginTop: 20, opacity: 0.7, fontSize: "0.92rem" }}>
-            At €{bp.assumed_spread_eur_mwh}/MWh assumed, that works out to{" "}
-            <DataMono tone="ember">€{Math.round(bp.assumed_gross_eur).toLocaleString()}</DataMono> a year.
-          </p>
         </div>
       </section>
 
