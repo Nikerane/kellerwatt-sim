@@ -154,12 +154,6 @@ export function HonestyPage() {
           the battery's specs. Best-case assumes perfect knowledge of tomorrow's
           prices. Realistic uses only past data.
         </p>
-        <p style={{ marginTop: 10, fontSize: "0.78rem", opacity: 0.55 }}>
-          Solver status: {results.solver.status}. Generated{" "}
-          {p.generated_utc}
-          {p.git_commit ? <> · build {p.git_commit.slice(0, 10)}</> : null}
-          . Schema v{results.schema_version}. {p.note}
-        </p>
       </footer>
     </main>
   );
