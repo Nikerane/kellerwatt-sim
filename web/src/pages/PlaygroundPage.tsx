@@ -20,7 +20,7 @@ const SLIDERS: SliderDef[] = [
     key: "capacity_kwh",
     label: "Battery capacity",
     min: 50,
-    max: 500,
+    max: 350,
     step: 25,
     default: 200,
     unit: "kWh",
