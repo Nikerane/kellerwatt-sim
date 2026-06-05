@@ -103,3 +103,11 @@ def test_ancillary_partial_split_is_allowed():
     ec.validate_ancillary_vs_arbitrage(
         reserved_power_kw=20.0, arbitrage_power_kw=30.0, battery=b
     )
+
+
+def test_gross_turnover_uses_magnitudes_for_negative_purchase():
+    # Agent finding: charging at negative prices makes purchase negative; gross
+    # turnover (|buy|+|sell|) must use magnitudes, not the signed sum.
+    t = ec.Turnover(sale_eur=8000.0, purchase_eur=-200.0)
+    assert t.gross_turnover == pytest.approx(8200.0)
+    assert ec.bkv_fee(contracts.FEE_BASIS_GROSS_TURNOVER, 0.05, t) == pytest.approx(0.05 * 8200.0)

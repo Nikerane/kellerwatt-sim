@@ -29,6 +29,25 @@ DEFAULT_TIEBREAK_EUR_MWH = 1.0  # tiny throughput tie-break (matches the spike's
 _EPS = 1e-9
 
 
+def _weighted_quantile(values: np.ndarray, weights: np.ndarray, q: float) -> float:
+    """Weighted quantile (each sample weighted by its interval length dt_h).
+
+    This keeps the trailing-window thresholds resolution-neutral: a 15-min sample
+    counts 1/4 of an hourly sample, so 15-min days are not over-weighted vs hourly
+    days in the ~28-day window straddling the 2025-10-01 go-live. For a uniform
+    resolution the weights are constant and this reduces to an ordinary quantile.
+    """
+    order = np.argsort(values, kind="mergesort")
+    v = values[order]
+    w = weights[order]
+    cw = np.cumsum(w) - 0.5 * w
+    total = w.sum()
+    if total <= 0:
+        return float(v[0])
+    cw /= total
+    return float(np.interp(q, cw, v))
+
+
 # ===== (a) LP perfect-foresight ceiling ======================================
 
 @dataclass(frozen=True)
@@ -59,6 +78,12 @@ def solve_day_ceiling(
 ) -> DayDispatch:
     """Perfect-foresight LP for one delivery day. €/MWh charges; kW powers; kWh SoC."""
     T = len(prices)
+    if T == 0:
+        # Degenerate empty day: nothing to dispatch. (The loader fails loud on
+        # incomplete days, so this is unreachable in the real pipeline, but we
+        # must not IndexError on soc[-1].)
+        return DayDispatch(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, "Optimal",
+                           (), (), (), battery.soc_min_kwh)
     P = battery.power_kw
     eta = battery.eta_one_way
     smin, smax = battery.soc_min_kwh, battery.soc_max_kwh
@@ -223,13 +248,16 @@ def run_causal_walkforward(
         dt = day.dt_h
         traded = i >= params.trailing_days
         if traded:
+            prior = days[i - params.trailing_days:i]
             window = np.fromiter(
-                (p for dd in days[i - params.trailing_days:i] for p in dd.prices),
-                dtype=float,
+                (p for dd in prior for p in dd.prices), dtype=float,
+            )
+            wts = np.fromiter(
+                (dd.dt_h for dd in prior for _ in dd.prices), dtype=float,
             )
             last_window = window
-            ch_thr = float(np.quantile(window, params.charge_quantile))
-            dis_thr = float(np.quantile(window, params.discharge_quantile))
+            ch_thr = _weighted_quantile(window, wts, params.charge_quantile)
+            dis_thr = _weighted_quantile(window, wts, params.discharge_quantile)
         else:
             ch_thr = dis_thr = None
 

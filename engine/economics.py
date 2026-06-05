@@ -40,7 +40,9 @@ class Turnover:
 
     @property
     def gross_turnover(self) -> float:
-        return self.sale_eur + self.purchase_eur
+        # |buy| + |sell| traded value. Magnitudes matter because charging during
+        # negative-price intervals makes purchase_eur negative (paid energy).
+        return abs(self.sale_eur) + abs(self.purchase_eur)
 
 
 def bkv_fee(basis: str, rate: float, turnover: Turnover) -> float:
