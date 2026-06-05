@@ -41,6 +41,7 @@ class BacktestResult:
     causal: dict
     causal_terminal_value_eur: float
     year_data: dict  # year -> YearData (for negative-price metrics etc.)
+    causal_result: dispatch.CausalResult | None = None  # raw per-day causal data
 
 
 # ---- pure aggregation -------------------------------------------------------
@@ -181,4 +182,5 @@ def run_backtest(
         causal=causal,
         causal_terminal_value_eur=causal_result.terminal_value_eur,
         year_data=year_data,
+        causal_result=causal_result,
     )
