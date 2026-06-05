@@ -166,6 +166,9 @@ class CausalDay:
     soc_start_kwh: float
     soc_end_kwh: float
     traded: bool
+    charge_kw: tuple = ()     # per-interval charge power (kW AC)
+    discharge_kw: tuple = ()  # per-interval discharge power (kW AC)
+    soc_kwh: tuple = ()       # per-interval state-of-charge (kWh)
 
 
 @dataclass(frozen=True)
@@ -268,41 +271,50 @@ def run_causal_walkforward(
         soc_start = soc
         day_dis_ac = 0.0
         g = net = mdis = mchg = sale = purchase = 0.0
+        day_charge: list[float] = []
+        day_discharge: list[float] = []
+        day_soc: list[float] = []
 
         for price in day.prices:
+            c_kw = d_kw = 0.0
             # Charge on cheap intervals, only if a positive round-trip is expected
             # after the marginal grid fee (marginal charge inside the policy, Codex 4).
             if traded and price <= ch_thr and soc < smax - _EPS \
                     and (price + grid_fee_charge) < dis_thr * rte:
-                c_kw = min(P, (smax - soc) / (eta * dt))
-                if c_kw > _EPS:
-                    e_ac = c_kw * dt
-                    soc += eta * c_kw * dt
+                c_candidate = min(P, (smax - soc) / (eta * dt))
+                if c_candidate > _EPS:
+                    e_ac = c_candidate * dt
+                    soc += eta * c_candidate * dt
                     cost = (price / 1000.0) * e_ac
                     g -= cost
                     purchase += cost
                     net -= ((price + grid_fee_charge) / 1000.0) * e_ac
                     mchg += e_ac / 1000.0
-                    continue
+                    c_kw = c_candidate
             # Discharge on expensive intervals, within SoC and the daily cycle cap.
-            if traded and price >= dis_thr and soc > smin + _EPS \
+            elif traded and price >= dis_thr and soc > smin + _EPS \
                     and day_dis_ac < budget_cap - _EPS \
                     and (price - degradation_discharge) > ch_thr / rte:
-                d_kw = min(P, (soc - smin) * eta / dt, (budget_cap - day_dis_ac) / dt)
-                if d_kw > _EPS:
-                    e_ac = d_kw * dt
-                    soc -= d_kw / eta * dt
+                d_candidate = min(P, (soc - smin) * eta / dt, (budget_cap - day_dis_ac) / dt)
+                if d_candidate > _EPS:
+                    e_ac = d_candidate * dt
+                    soc -= d_candidate / eta * dt
                     rev = (price / 1000.0) * e_ac
                     g += rev
                     sale += rev
                     net += ((price - degradation_discharge) / 1000.0) * e_ac
                     mdis += e_ac / 1000.0
                     day_dis_ac += e_ac
-                    continue
-            # else idle
+                    d_kw = d_candidate
+            # else idle: c_kw = d_kw = 0.0 (set at top)
+            day_charge.append(c_kw)
+            day_discharge.append(d_kw)
+            day_soc.append(soc)
 
         results.append(CausalDay(day.day, g, net, mdis, mchg, sale, purchase,
-                                 soc_start, soc, traded))
+                                 soc_start, soc, traded,
+                                 tuple(day_charge), tuple(day_discharge),
+                                 tuple(day_soc)))
 
     # Deterministic terminal restoration: value the net horizon energy change at a
     # causal reference (median of the last trailing window), discounted through eta,
