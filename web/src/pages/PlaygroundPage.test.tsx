@@ -70,9 +70,19 @@ describe("PlaygroundPage", () => {
     expect(screen.getByText("300 kWh")).toBeInTheDocument();
   });
 
-  it("shows ready status when no engine URL is configured", () => {
+  it("shows ready status after health check resolves", async () => {
     render(<PlaygroundPage />);
-    // With ENGINE_URL empty, it should show Ready immediately
-    expect(screen.getByText(/Ready/)).toBeInTheDocument();
+    // Engine URL is set, so it starts as "warming" but the mocked health check
+    // should transition to "Ready" after the poll resolves.
+    expect(await screen.findByText(/Ready/, {}, { timeout: 2000 })).toBeInTheDocument();
+  });
+
+  it("renders daily dispatch section with nav controls", () => {
+    render(<PlaygroundPage />);
+    expect(screen.getByText(/Daily dispatch/)).toBeInTheDocument();
+    expect(screen.getByText(/Best Day/)).toBeInTheDocument();
+    expect(screen.getByText(/Worst Day/)).toBeInTheDocument();
+    const dateInput = document.querySelector('input[type="date"]');
+    expect(dateInput).toBeInTheDocument();
   });
 });

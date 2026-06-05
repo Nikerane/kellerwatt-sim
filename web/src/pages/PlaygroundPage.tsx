@@ -6,9 +6,10 @@ import { PlaygroundSlider } from "../components/PlaygroundSlider";
 import { PlaygroundResults } from "../components/PlaygroundResults";
 import { PlaygroundChart } from "../components/PlaygroundChart";
 import type { SliderDef } from "../components/PlaygroundSlider";
-import type { SolveResponse } from "../data/playground";
+import type { SolveResponse, DayDetailResponse } from "../data/playground";
 import { results as defaultResults } from "../data/load";
 import { YEARS } from "../data/load";
+import { DailyDispatchChart } from "../components/DailyDispatchChart";
 
 // ------- engine URL (HF Space) ----------
 // When running locally without the HF backend, leave empty to use baked-in defaults.
@@ -149,6 +150,50 @@ export function PlaygroundPage() {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const healthPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const mountedRef = useRef(true);
+  const [dayDetail, setDayDetail] = useState<DayDetailResponse | null>(null);
+  const [selectedDate, setSelectedDate] = useState<string>("");
+  const [dayLoading, setDayLoading] = useState(false);
+
+  // ------ fetch per-day dispatch detail ------
+  const fetchDayDetail = useCallback(
+    async (dateStr: string) => {
+      if (!ENGINE_URL) return;
+      setDayLoading(true);
+      try {
+        const res = await fetch(`${ENGINE_URL}/day-detail`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            date: dateStr,
+            battery: {
+              capacity_kwh: values.capacity_kwh,
+              power_kw: values.power_kw,
+              rte: values.rte,
+            },
+            grid_fee_eur_mwh: values.grid_fee,
+          }),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data: DayDetailResponse = await res.json();
+        if (mountedRef.current) {
+          setDayDetail(data);
+          setSelectedDate(dateStr);
+        }
+      } catch {
+        /* keep previous detail if fetch fails */
+      } finally {
+        if (mountedRef.current) setDayLoading(false);
+      }
+    },
+    [values],
+  );
+
+  // Auto-fetch a default day when engine first solves
+  useEffect(() => {
+    if (engineStatus === "solved" && dayDetail === null && ENGINE_URL) {
+      fetchDayDetail("2025-06-15");
+    }
+  }, [engineStatus, dayDetail, fetchDayDetail]);
 
   // ------ health-check warm-up on mount ------
   useEffect(() => {
@@ -337,6 +382,70 @@ export function PlaygroundPage() {
             <PlaygroundResults data={response} year={latest} />
           </div>
           <PlaygroundChart data={response} />
+        </div>
+      </section>
+
+      {/* Daily Dispatch */}
+      <section className="kw-section kw-section--bone">
+        <div className="kw-section__inner">
+          <Eyebrow>Daily dispatch</Eyebrow>
+          <p className="kw-lead" style={{ marginTop: 8, marginBottom: 20 }}>
+            Per-interval charge / discharge on a real price curve. Ceiling is
+            perfect-foresight; causal is walk-forward. Compare best and worst days.
+          </p>
+
+          {/* Navigation */}
+          <div style={{
+            display: "flex", gap: 10, marginBottom: 24, flexWrap: "wrap",
+            alignItems: "center",
+          }}>
+            <button
+              type="button"
+              className="kw-toggle__btn"
+              disabled={!dayDetail || dayLoading || selectedDate === dayDetail.best_date}
+              onClick={() => fetchDayDetail(dayDetail!.best_date)}
+              style={{ fontSize: "0.8rem" }}
+            >
+              ★ Best Day
+            </button>
+            <button
+              type="button"
+              className="kw-toggle__btn"
+              disabled={!dayDetail || dayLoading || selectedDate === dayDetail.worst_date}
+              onClick={() => fetchDayDetail(dayDetail!.worst_date)}
+              style={{ fontSize: "0.8rem" }}
+            >
+              ▼ Worst Day
+            </button>
+            <input
+              type="date"
+              className="kw-toggle__btn"
+              value={selectedDate}
+              min={dayDetail?.available_dates[0] ?? ""}
+              max={dayDetail?.available_dates[dayDetail.available_dates.length - 1] ?? ""}
+              onChange={(e) => fetchDayDetail(e.target.value)}
+              disabled={dayLoading}
+              style={{ fontSize: "0.8rem", fontFamily: "var(--mono)" }}
+            />
+            {dayLoading && (
+              <span style={{ fontSize: "0.78rem", opacity: 0.6 }}>Loading…</span>
+            )}
+          </div>
+
+          {dayDetail && (
+            <div
+              className="kw-dispatch-grid"
+              style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}
+            >
+              <DailyDispatchChart data={dayDetail} strategy="ceiling" />
+              <DailyDispatchChart data={dayDetail} strategy="causal" />
+            </div>
+          )}
+          {!dayDetail && !ENGINE_URL && (
+            <p style={{ fontSize: "0.88rem", opacity: 0.6 }}>
+              Daily dispatch requires the live engine backend.
+            </p>
+          )}
         </div>
       </section>
 
