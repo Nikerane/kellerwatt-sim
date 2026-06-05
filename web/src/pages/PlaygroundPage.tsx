@@ -12,7 +12,7 @@ import { YEARS } from "../data/load";
 
 // ------- engine URL (HF Space) ----------
 // When running locally without the HF backend, leave empty to use baked-in defaults.
-const ENGINE_URL = "";
+const ENGINE_URL = "https://nikerane-kellerwatt-engine.hf.space";
 
 // ------- slider definitions ----------
 const SLIDERS: SliderDef[] = [
