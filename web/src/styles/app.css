@@ -48,6 +48,10 @@ body {
   margin: 0 auto;
   padding: clamp(56px, 9vw, 120px) var(--gutter);
 }
+.kw-section--tight .kw-section__inner {
+  padding-top: clamp(28px, 4vw, 64px);
+  padding-bottom: clamp(28px, 4vw, 64px);
+}
 
 .kw-section--hearth {
   background: var(--hearth);

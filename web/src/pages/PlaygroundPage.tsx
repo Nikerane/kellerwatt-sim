@@ -264,7 +264,7 @@ export function PlaygroundPage() {
       </section>
 
       {/* Sliders panel */}
-      <section className="kw-section kw-section--bone">
+      <section className="kw-section kw-section--bone kw-section--tight">
         <div className="kw-section__inner">
           <div
             style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 28 }}
@@ -340,7 +340,7 @@ export function PlaygroundPage() {
       </section>
 
       {/* Chart */}
-      <section className="kw-section kw-section--hearth">
+      <section className="kw-section kw-section--hearth kw-section--tight">
         <div className="kw-section__inner">
           <PlaygroundChart data={response} />
         </div>

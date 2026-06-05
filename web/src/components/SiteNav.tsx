@@ -6,7 +6,7 @@ export function SiteNav({ current }: { current: "honesty" | "methodology" | "pla
       <a className="kw-nav__brand" href="https://nikerane.github.io/kellerwatt/index.html">KellerWatt</a>
       <span className="kw-nav__links">
         <a aria-current={current === "honesty" ? "page" : undefined} href="https://nikerane.github.io/kellerwatt-sim/index.html">
-          The number
+          Validation
         </a>
         <a aria-current={current === "methodology" ? "page" : undefined} href="https://nikerane.github.io/kellerwatt-sim/methodology.html">
           Methodology
