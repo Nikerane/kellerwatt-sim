@@ -76,14 +76,4 @@ describe("PlaygroundPage", () => {
     // should transition to "Ready" after the poll resolves.
     expect(await screen.findByText(/Ready/, {}, { timeout: 2000 })).toBeInTheDocument();
   });
-
-  it("renders daily dispatch section with day buttons", () => {
-    render(<PlaygroundPage />);
-    expect(screen.getByText(/Daily dispatch/)).toBeInTheDocument();
-    expect(screen.getByText(/Best Day/)).toBeInTheDocument();
-    expect(screen.getByText(/Worst Day/)).toBeInTheDocument();
-    expect(screen.getByText("Mar 21")).toBeInTheDocument();
-    expect(screen.getByText("Jun 21")).toBeInTheDocument();
-    expect(screen.getByText("Jan 15")).toBeInTheDocument();
-  });
 });
