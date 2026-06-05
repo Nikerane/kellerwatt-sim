@@ -8,7 +8,6 @@ import {
   eurPerMwh,
   cycles,
 } from "../data/load";
-import type { Metric } from "../data/types";
 
 type Tone = "neutral" | "ember" | "muted";
 
@@ -21,13 +20,10 @@ interface Col {
   spread: number | null;
   annual: number | null;
   cyclesPerDay: number | null;
-  irr: Metric | null;
-  payback: Metric | null;
 }
 
-/** The case table (B3). Cases are columns; metrics are rows. The validated ceiling
-    is the single Ember signal. IRR/payback for the causal cases carry the
-    methodology label and a "provisional" tag — never a fabricated number. */
+/** The case table (B3). Cases are columns; metrics are rows. The validated best-case
+    is the single Ember signal. */
 export function CaseTable({ year }: { year: number }) {
   const bp = results.assumptions.business_plan;
   const ceil = yearOf(strategy("lp_ceiling"), year);
@@ -45,32 +41,26 @@ export function CaseTable({ year }: { year: number }) {
       spread: bp.assumed_spread_eur_mwh,
       annual: bp.assumed_gross_eur,
       cyclesPerDay: bp.assumed_cycles_per_day,
-      irr: null,
-      payback: null,
     },
     {
       key: "ceiling",
-      title: "Ceiling",
-      sub: "perfect foresight",
+      title: "Best-case",
+      sub: "perfect info",
       status: "validated",
       tone: "ember",
       spread: ceil.ceiling_eur_mwh,
       annual: ceil.gross_eur,
       cyclesPerDay: ceil.cycles_ac,
-      irr: null,
-      payback: null,
     },
     {
       key: "causal",
-      title: "Causal",
-      sub: "walk-forward",
+      title: "Realistic",
+      sub: "actual strategy",
       status: "estimate",
       tone: "neutral",
       spread: retained.implied_spread.value,
       annual: retained.net_annual_eur,
       cyclesPerDay: causalYear.cycles_ac,
-      irr: retained.irr,
-      payback: retained.payback_years,
     },
     {
       key: "lost",
@@ -81,8 +71,6 @@ export function CaseTable({ year }: { year: number }) {
       spread: lost.implied_spread.value,
       annual: lost.net_annual_eur,
       cyclesPerDay: causalYear.cycles_ac,
-      irr: lost.irr,
-      payback: lost.payback_years,
     },
   ];
 
@@ -141,45 +129,7 @@ export function CaseTable({ year }: { year: number }) {
             </td>
           ))}
         </tr>
-        <tr>
-          <th scope="row">
-            Project IRR
-            <span className="kw-table__row-note">unlevered · constant-EBITDA</span>
-          </th>
-          {cols.map((c) => (
-            <td key={c.key} className={valCls(c)}>
-              <ProvisionalCell metric={c.irr} fmt={(v) => `${(v * 100).toFixed(1)}%`} />
-            </td>
-          ))}
-        </tr>
-        <tr>
-          <th scope="row">
-            Payback
-            <span className="kw-table__row-note">years</span>
-          </th>
-          {cols.map((c) => (
-            <td key={c.key} className={valCls(c)}>
-              <ProvisionalCell metric={c.payback} fmt={(v) => `${v.toFixed(1)} yr`} />
-            </td>
-          ))}
-        </tr>
       </tbody>
     </table>
-  );
-}
-
-function ProvisionalCell({
-  metric,
-  fmt,
-}: {
-  metric: Metric | null;
-  fmt: (v: number) => string;
-}) {
-  if (!metric) return <DataMono tone="muted">—</DataMono>;
-  return (
-    <span title={metric.methodology_label}>
-      <DataMono tone="muted">{metric.value === null ? "—" : fmt(metric.value)}</DataMono>
-      <span className={`kw-status kw-status--${metric.status}`}>{metric.status}</span>
-    </span>
   );
 }

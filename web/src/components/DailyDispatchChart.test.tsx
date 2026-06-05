@@ -37,14 +37,14 @@ describe("DailyDispatchChart", () => {
   it("renders ceiling strategy title", () => {
     render(<DailyDispatchChart data={mockData} strategy="ceiling" />);
     expect(
-      screen.getByText("Ceiling (perfect foresight)"),
+      screen.getByText("Best-case (perfect info)"),
     ).toBeInTheDocument();
   });
 
   it("renders causal strategy title", () => {
     render(<DailyDispatchChart data={mockData} strategy="causal" />);
     expect(
-      screen.getByText("Causal (walk-forward)"),
+      screen.getByText("Realistic (actual strategy)"),
     ).toBeInTheDocument();
   });
 
@@ -63,14 +63,14 @@ describe("DailyDispatchChart", () => {
     render(<DailyDispatchChart data={mockData} strategy="ceiling" />);
     const svg = screen.getByRole("img");
     expect(svg).toBeInTheDocument();
-    expect(svg.getAttribute("aria-label")).toContain("Ceiling");
+    expect(svg.getAttribute("aria-label")).toContain("Best-case");
   });
 
-  it("shows the legend with charge/discharge/SoC", () => {
+  it("shows the legend with charging/discharging/price", () => {
     render(<DailyDispatchChart data={mockData} strategy="ceiling" />);
-    expect(screen.getByText("Charge")).toBeInTheDocument();
-    expect(screen.getByText("Discharge")).toBeInTheDocument();
-    expect(screen.getByText("SoC")).toBeInTheDocument();
+    expect(screen.getByText("Charging")).toBeInTheDocument();
+    expect(screen.getByText("Discharging")).toBeInTheDocument();
+    expect(screen.getByText("Price")).toBeInTheDocument();
   });
 
   it("handles empty arrays gracefully", () => {

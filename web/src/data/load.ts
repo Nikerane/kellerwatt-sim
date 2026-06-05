@@ -51,7 +51,7 @@ export function metricDisplay(value: number | null, fmt: (v: number) => string):
   return value === null ? "—" : fmt(value);
 }
 
-/** Causal capture as a share of the perfect-foresight ceiling gross. */
+/** Realistic capture as a share of the best-case gross. */
 export function captureOfCeiling(year: number): number | null {
   const ce = yearOf(strategy("lp_ceiling"), year).gross_eur;
   const ca = yearOf(strategy("causal_walkforward"), year).gross_eur;

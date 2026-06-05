@@ -66,9 +66,9 @@ export function HonestyPage() {
           what is only an estimate, and names what is still in diligence.
         </p>
         <div className="kw-hero__meta kw-fade kw-fade--3">
-          <Stat label="Validated ceiling" value={`${eurPerMwh(ceilMin)}–${eurPerMwh(ceilMax)}`} ember />
+          <Stat label="Validated best-case" value={`${eurPerMwh(ceilMin)}–${eurPerMwh(ceilMax)}`} ember />
           <Stat label="Years backtested" value={String(YEARS.length)} />
-          <Stat label="Causal of ceiling" value={`${capLo}–${capHi}%`} />
+          <Stat label="Realistic vs best-case" value={`${capLo}–${capHi}%`} />
           <Stat label="Simultaneity" value="0" />
         </div>
       </Section>
@@ -82,8 +82,8 @@ export function HonestyPage() {
           size="lg"
         />
         <p className="kw-lead" style={{ marginTop: 20, marginBottom: 36 }}>
-          The ceiling is the most a battery could earn with perfect foresight — an upper
-          bound, validated to the decimal on real prices. The causal case is a backtested
+          The best-case is the most a battery could earn with perfect information — an upper
+          bound, validated to the decimal on real prices. The realistic case is a backtested
           estimate; the conservative case adds the grid fee owed if the §118(6) exemption is
           lost. IRR and payback stay blank until two diligence items land.
         </p>
@@ -103,16 +103,16 @@ export function HonestyPage() {
       <Section tone="hearth">
         <Eyebrow>The spread, by year</Eyebrow>
         <Couplet
-          first="The ceiling is rising."
+          first="The best case is rising."
           second="It has stayed under €80 every year."
           size="lg"
         />
         <div className="kw-split kw-split--chart" style={{ marginTop: 44 }}>
           <p className="kw-lead">
             Day-ahead spreads widened from {YEARS[0]} to {latest} as the system absorbed more
-            renewables and more negative-price hours. Even so, the perfect-foresight ceiling
-            never reached the assumed €80 — and a causal operator, blind to the day ahead,
-            captured only {capLo}–{capHi}% of that ceiling.
+            renewables and more negative-price hours. Even so, the best-case scenario
+            never reached the assumed €80 — and a real operator, blind to the day ahead,
+            captured only {capLo}–{capHi}% of that best case.
           </p>
           <SpreadChart />
         </div>
@@ -139,9 +139,8 @@ export function HonestyPage() {
           />
         </ul>
         <p className="kw-lead" style={{ marginTop: 28, fontSize: "0.92rem", opacity: 0.82 }}>
-          Until both land, project IRR and payback are labelled{" "}
-          <span className="kw-status kw-status--provisional">provisional</span> and shown blank —
-          a constant-EBITDA placeholder is not a return.
+          Until both land, project IRR and payback remain blank — a constant-EBITDA
+          placeholder is not a return.
         </p>
       </Section>
 

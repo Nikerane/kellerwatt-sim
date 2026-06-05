@@ -401,8 +401,9 @@ export function PlaygroundPage() {
             )}
           </div>
           <p className="kw-lead" style={{ marginTop: 0, marginBottom: 22 }}>
-            Per-interval charge / discharge on a real price curve. Ceiling is
-            perfect-foresight; causal is walk-forward.
+            Per-interval charge / discharge on a real price curve.
+            Best-case shows what you'd earn with perfect information; realistic
+            shows what a real strategy would actually capture.
           </p>
 
           {/* Day picker — best, worst, seasonal */}
@@ -455,9 +456,9 @@ export function PlaygroundPage() {
         <Eyebrow>Engine</Eyebrow>
         <p style={{ marginTop: 14 }}>
           Same Python solver (HiGHS {defaultResults.solver.version}) on real DE-LU
-          day-ahead prices from Energy-Charts. Ceilings are perfect-foresight upper
-          bounds. Causal is a backtested estimate. IRR / payback stay null until
-          diligence items land.
+          day-ahead prices from Energy-Charts. Best-case is a perfect-information
+          upper bound. Realistic is a backtested estimate. IRR / payback stay null
+          until diligence items land.
         </p>
       </footer>
     </main>

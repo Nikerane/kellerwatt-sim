@@ -37,8 +37,8 @@ export function PlaygroundResults({ data, year }: Props) {
     },
     {
       key: "ceiling",
-      title: "Ceiling",
-      sub: "perfect foresight",
+      title: "Best-case",
+      sub: "perfect info",
       tone: "ember",
       spread: ceil?.spread_eur_mwh ?? null,
       annual: ceil?.gross_eur ?? null,
@@ -46,7 +46,7 @@ export function PlaygroundResults({ data, year }: Props) {
     },
     {
       key: "causal-retained",
-      title: "Causal",
+      title: "Realistic",
       sub: "exemption retained",
       tone: "neutral",
       spread: causalR?.spread_eur_mwh ?? null,

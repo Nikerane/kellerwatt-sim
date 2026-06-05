@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libstdc++6 \
     && rm -rf /var/lib/apt/lists/*
 
-COPY backend/requirements.txt .
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Engine source
@@ -17,7 +17,7 @@ COPY engine/ engine/
 COPY engine/data/cache/ engine/data/cache/
 
 # FastAPI app
-COPY backend/main.py .
+COPY main.py .
 
 # Hugging Face Spaces expects port 7860
 ENV PORT=7860

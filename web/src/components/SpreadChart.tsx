@@ -9,7 +9,7 @@ function linePath(pts: Array<[number, number]>): string {
   return pts.map(([x, y], i) => `${i === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
 }
 
-/** Widening-spread chart (B4). Perfect-foresight ceiling vs causal benchmark,
+/** Widening-spread chart (B4). Best-case vs realistic benchmark,
     2023→2025, with the €80 assumption as a dashed reference and the bracket
     between the two strategies shaded. Hand-rolled SVG on d3 scales — no chart lib.
     Lives on a Hearth section, so it reads light-on-dark. */
@@ -37,7 +37,7 @@ export function SpreadChart() {
         aria-label={
           `Captured spread by year. Assumed €${assumed} per MWh. ` +
           years
-            .map((yr, i) => `${yr}: ceiling €${ceiling[i].toFixed(1)}, causal €${causal[i].toFixed(1)}`)
+            .map((yr, i) => `${yr}: best €${ceiling[i].toFixed(1)}, real €${causal[i].toFixed(1)}`)
             .join("; ") +
           "."
         }
@@ -52,7 +52,7 @@ export function SpreadChart() {
           </g>
         ))}
 
-        {/* shaded bracket between ceiling and causal */}
+        {/* shaded bracket between best and real */}
         <path className="kw-chart__bracket" d={bracket} />
 
         {/* assumed €80 reference */}
@@ -61,11 +61,11 @@ export function SpreadChart() {
           €{assumed} assumed
         </text>
 
-        {/* causal + ceiling lines */}
+        {/* best + real lines */}
         <path className="kw-chart__causal" d={linePath(causPts)} />
         <path className="kw-chart__ceiling" d={linePath(ceilPts)} />
 
-        {/* ceiling points with value labels (the Ember signal) */}
+        {/* best-case points with value labels (the Ember signal) */}
         {ceilPts.map(([cx, cy], i) => (
           <g key={i}>
             <circle className="kw-chart__dot" cx={cx} cy={cy} r={4.5} />
@@ -97,11 +97,11 @@ export function SpreadChart() {
       <div className="kw-chart__legend">
         <span>
           <span className="kw-chart__swatch" style={{ borderColor: "var(--ember)" }} />
-          Perfect-foresight ceiling
+          Best-case (perfect info)
         </span>
         <span>
           <span className="kw-chart__swatch" style={{ borderColor: "rgba(245,241,234,0.85)" }} />
-          Causal walk-forward
+          Realistic strategy
         </span>
         <span>
           <span

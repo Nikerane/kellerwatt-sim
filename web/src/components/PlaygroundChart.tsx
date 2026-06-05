@@ -54,7 +54,7 @@ export function PlaygroundChart({ data }: Props) {
           years
             .map(
               (yr, i) =>
-                `${yr}: ceiling €${ceiling[i].toFixed(1)}, causal €${causal[i].toFixed(1)}`,
+                `${yr}: best €${ceiling[i].toFixed(1)}, real €${causal[i].toFixed(1)}`,
             )
             .join("; ") +
           "."
@@ -147,14 +147,14 @@ export function PlaygroundChart({ data }: Props) {
             className="kw-chart__swatch"
             style={{ borderColor: "var(--ember)" }}
           />
-          Ceiling
+          Best-case
         </span>
         <span>
           <span
             className="kw-chart__swatch"
             style={{ borderColor: "rgba(245,241,234,0.85)" }}
           />
-          Causal
+          Realistic
         </span>
         <span>
           <span

@@ -41,3 +41,15 @@ export interface DayDetailResponse {
   ceiling: StrategyDayDetail;
   causal: StrategyDayDetail;
 }
+
+/** Shape of a precomputed dispatch lookup file (cap_050.json, etc.). */
+export interface DispatchFile {
+  capacity_kwh: number;
+  days: Record<string, { prices: number[]; dt_h: number }>;
+  combos: Record<string, {
+    best_date: string;
+    worst_date: string;
+    ceiling: Record<string, StrategyDayDetail>;
+    causal: Record<string, StrategyDayDetail>;
+  }>;
+}

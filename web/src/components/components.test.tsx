@@ -35,22 +35,16 @@ describe("primitives", () => {
 });
 
 describe("CaseTable", () => {
-  it("renders the four cases with the validated ceiling as the signal", () => {
+  it("renders the four cases with the validated best-case as the signal", () => {
     render(<CaseTable year={2025} />);
     expect(screen.getByText("Assumed")).toBeInTheDocument();
-    expect(screen.getByText("Ceiling")).toBeInTheDocument();
-    expect(screen.getByText("Causal")).toBeInTheDocument();
+    expect(screen.getByText("Best-case")).toBeInTheDocument();
+    expect(screen.getByText("Realistic")).toBeInTheDocument();
     expect(screen.getByText("Conservative")).toBeInTheDocument();
-    // the validated 2025 ceiling spread appears
+    // the validated 2025 best-case spread appears
     expect(screen.getByText("€77.3")).toBeInTheDocument();
-    // exactly one "validated" status tag (the ceiling column)
+    // exactly one "validated" status tag (the best-case column)
     expect(screen.getAllByText("validated")).toHaveLength(1);
-  });
-
-  it("shows IRR/payback as provisional, never a number", () => {
-    render(<CaseTable year={2025} />);
-    // causal + conservative each carry provisional IRR and payback => 4 tags.
-    expect(screen.getAllByText("provisional").length).toBeGreaterThanOrEqual(4);
   });
 });
 
@@ -59,9 +53,9 @@ describe("SpreadChart", () => {
     const { container } = render(<SpreadChart />);
     const svg = container.querySelector("svg");
     expect(svg).toHaveAttribute("role", "img");
-    expect(svg?.getAttribute("aria-label")).toMatch(/ceiling €77.3/);
+    expect(svg?.getAttribute("aria-label")).toMatch(/best €77.3/);
     expect(svg?.getAttribute("aria-label")).toMatch(/€80/);
-    // bracket + causal + ceiling lines at least.
+    // bracket + best + real lines at least.
     expect(container.querySelectorAll("path").length).toBeGreaterThanOrEqual(3);
   });
 });
