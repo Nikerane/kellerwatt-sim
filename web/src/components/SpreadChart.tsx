@@ -97,11 +97,11 @@ export function SpreadChart() {
       <div className="kw-chart__legend">
         <span>
           <span className="kw-chart__swatch" style={{ borderColor: "var(--ember)" }} />
-          Best-case (perfect info)
+          Best case (sees the future)
         </span>
         <span>
           <span className="kw-chart__swatch" style={{ borderColor: "rgba(245,241,234,0.85)" }} />
-          Realistic strategy
+          Realistic (blind)
         </span>
         <span>
           <span

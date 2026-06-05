@@ -10,6 +10,8 @@ export interface SliderDef {
   unit: string;
   /** Optional: format the value differently from the raw number (e.g. "90%" for 0.90). */
   formatValue?: (v: number) => string;
+  /** Optional: a short plain-language hint shown under the slider. */
+  hint?: string;
 }
 
 interface Props {
@@ -59,6 +61,19 @@ export function PlaygroundSlider({ slider, value, onChange, disabled }: Props) {
         <span>{slider.formatValue ? slider.formatValue(slider.min) : `${slider.min}`}</span>
         <span>{slider.formatValue ? slider.formatValue(slider.max) : `${slider.max}`}</span>
       </span>
+      {slider.hint && (
+        <span
+          className="kw-slider__hint"
+          style={{
+            fontFamily: "var(--sans)",
+            fontSize: "0.72rem",
+            opacity: 0.5,
+            color: "var(--slate)",
+          }}
+        >
+          {slider.hint}
+        </span>
+      )}
     </label>
   );
 }

@@ -39,7 +39,7 @@ export function MethodologyPage() {
           <p className="kw-lead" style={{ marginTop: 18, marginBottom: 24 }}>
             Every figure on the Validation page starts from a single battery unit
             and a set of fixed inputs — the same spreadsheet model, solved against
-            real DE-LU prices.
+            real German day-ahead prices.
           </p>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 20, marginBottom: 36 }}>
@@ -61,7 +61,7 @@ export function MethodologyPage() {
           <Eyebrow>How the real numbers are computed</Eyebrow>
           <p className="kw-lead" style={{ marginTop: 18, marginBottom: 24 }}>
             The validated best-case and realistic figures come from running{" "}
-            <strong>HiGHS</strong> — an open-source linear optimisation solver —
+            <strong>HiGHS</strong> — a free, industry-standard solver —
             on real Energy-Charts day-ahead prices across {YEARS.length} years
             ({YEARS[0]} to {latest}). Both strategies use the exact same data
             — ~26,000 hourly prices over 1,095 days. The difference is what they
@@ -75,20 +75,19 @@ export function MethodologyPage() {
             marginBottom: 20,
           }}>
             <strong style={{ fontFamily: "var(--serif)", fontWeight: 500, fontSize: "1.1rem" }}>
-              1. Best-case — the linear program
+              1. Best case — perfect foresight
             </strong>
             <p style={{ marginTop: 10, opacity: 0.75, lineHeight: 1.6 }}>
-              An LP (Linear Program) is a mathematical optimisation technique.
-              HiGHS gets all 24 hourly prices for a given day and finds the
-              charge/discharge schedule that maximises profit. It can charge
-              when prices are cheap and discharge when they are expensive —{" "}
+              The solver gets all 24 hourly prices for a day and finds the
+              charge-and-sell schedule that earns the most. It buys when power is
+              cheap and sells when it's dear —{" "}
               <strong>because it already knows every price for that day.</strong>
             </p>
             <p style={{ marginTop: 8, opacity: 0.6, fontSize: "0.9rem" }}>
-              This is an <strong>upper bound</strong>. No real operator can achieve
-              it — you don't know the next hour's price. But it's useful as a
-              benchmark: the actual result can never be higher. Every number is
-              validated to the decimal on real data, not a forecast.
+              This is a <strong>ceiling</strong>. No real operator can reach it —
+              nobody knows the next hour's price. But it's a useful benchmark: the
+              real result can never beat it. Every figure is checked to the cent on
+              real prices, not a forecast.
             </p>
           </div>
 
@@ -99,19 +98,19 @@ export function MethodologyPage() {
             marginBottom: 20,
           }}>
             <strong style={{ fontFamily: "var(--serif)", fontWeight: 500, fontSize: "1.1rem" }}>
-              2. Realistic — the causal walk-forward
+              2. Realistic — blind to the future
             </strong>
             <p style={{ marginTop: 10, opacity: 0.75, lineHeight: 1.6 }}>
-              This strategy operates <strong>blind to the future.</strong> At hour 1,
+              This strategy runs <strong>blind to the future.</strong> At each hour
               it knows only the price right now and the prices of the past 28 days.
-              It uses a trailing threshold: if today's price is below the 28-day
-              percentile, buy. If above, sell. No foresight — same information a
-              real operator has.
+              The rule is simple: if power is currently cheap against those 28 days,
+              buy; if it's dear, sell. No foresight — the same information a real
+              operator has.
             </p>
             <p style={{ marginTop: 8, opacity: 0.6, fontSize: "0.9rem" }}>
               This is a <strong>backtested estimate</strong> — what a real operator
-              with a simple rules-based strategy could have earned. It consistently
-              captures {capturePct}% of the best-case over {latest}.
+              following a simple rule could have earned. It captures about{" "}
+              {capturePct}% of the best case in {latest}.
             </p>
           </div>
 
@@ -121,12 +120,12 @@ export function MethodologyPage() {
             borderRadius: "var(--r-12)", border: "var(--hairline)",
           }}>
             <strong style={{ fontFamily: "var(--serif)", fontWeight: 500, fontSize: "1.1rem" }}>
-              3. Implied spreads — the common yardstick
+              3. Implied spread — the common yardstick
             </strong>
             <p style={{ marginTop: 10, opacity: 0.75, lineHeight: 1.6 }}>
-              Annual gross € ÷ MWh discharged = implied spread in €/MWh. Whether
-              the battery is 200 kWh or 350 kWh, the spread is the same metric —
-              the price difference captured per unit of energy.
+              Yearly euros ÷ energy sold = the implied spread, in €/MWh. Whether
+              the battery is 200 kWh or 350 kWh, the spread is the same yardstick —
+              the price gap captured per unit of energy.
             </p>
           </div>
         </div>
@@ -137,18 +136,18 @@ export function MethodologyPage() {
         <div className="kw-section__inner">
           <Eyebrow>Limitations</Eyebrow>
           <ul className="kw-diligence__list" style={{ marginTop: 18 }}>
-            <DiligenceItem body="Prices are day-ahead only. Intraday and balancing-market revenues are not included." />
-            <DiligenceItem body="Battery degradation is modelled as a fixed 2%/yr capacity loss per the assumptions spreadsheet." />
-            <DiligenceItem body="The causal strategy uses a 28-day trailing threshold. Real operators use more sophisticated forecasting." />
-            <DiligenceItem body="Grid fees use the simplified Energy-Charts model. Real German grid fees vary by region and voltage level." />
-            <DiligenceItem body="Ancillary-service revenue (FCR, aFRR) is excluded — arbitrage only." />
-            <DiligenceItem body="The model assumes one full cycle per day. Multi-cycle strategies may capture more value." />
+            <DiligenceItem body="Day-ahead prices only — faster intraday and balancing-market trades are not included." />
+            <DiligenceItem body="The battery is assumed to lose 2% of its capacity each year." />
+            <DiligenceItem body="The realistic strategy follows a simple 28-day rule. Real operators forecast more cleverly." />
+            <DiligenceItem body="Grid fees use a simplified model. Real German fees vary by region and voltage level." />
+            <DiligenceItem body="Grid-stability payments (FCR, aFRR) are excluded — this is buy-low, sell-high only." />
+            <DiligenceItem body="The model assumes one full cycle a day. Cycling more often could capture more." />
           </ul>
         </div>
       </section>
 
       <footer className="kw-footer">
-        <Eyebrow>Provenance</Eyebrow>
+        <Eyebrow>Source data</Eyebrow>
         <p style={{ marginTop: 14 }}>
           {results.provenance.data_source} · {results.provenance.price_zone} ·
           {" "}{results.provenance.years.join("–")} · schema v{results.schema_version}

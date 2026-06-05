@@ -45,7 +45,7 @@ export function CaseTable({ year }: { year: number }) {
     {
       key: "ceiling",
       title: "Best-case",
-      sub: "perfect info",
+      sub: "sees the future",
       status: "validated",
       tone: "ember",
       spread: ceil.ceiling_eur_mwh,
@@ -55,7 +55,7 @@ export function CaseTable({ year }: { year: number }) {
     {
       key: "causal",
       title: "Realistic",
-      sub: "actual strategy",
+      sub: "waiver kept",
       status: "estimate",
       tone: "neutral",
       spread: retained.implied_spread.value,
@@ -65,7 +65,7 @@ export function CaseTable({ year }: { year: number }) {
     {
       key: "lost",
       title: "Conservative",
-      sub: "exemption lost",
+      sub: "waiver lost",
       status: "estimate",
       tone: "neutral",
       spread: lost.implied_spread.value,
@@ -97,7 +97,7 @@ export function CaseTable({ year }: { year: number }) {
         <tr>
           <th scope="row">
             Implied spread
-            <span className="kw-table__row-note">€ / MWh discharged</span>
+            <span className="kw-table__row-note">price gap per MWh</span>
           </th>
           {cols.map((c) => (
             <td key={c.key} className={valCls(c)}>
@@ -110,7 +110,7 @@ export function CaseTable({ year }: { year: number }) {
         <tr>
           <th scope="row">
             Annual figure
-            <span className="kw-table__row-note">gross / net per year</span>
+            <span className="kw-table__row-note">euros per year</span>
           </th>
           {cols.map((c) => (
             <td key={c.key} className={valCls(c)}>
@@ -121,7 +121,7 @@ export function CaseTable({ year }: { year: number }) {
         <tr>
           <th scope="row">
             Cycles / day
-            <span className="kw-table__row-note">AC delivered</span>
+            <span className="kw-table__row-note">full cycles</span>
           </th>
           {cols.map((c) => (
             <td key={c.key} className={valCls(c)}>

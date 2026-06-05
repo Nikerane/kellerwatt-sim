@@ -47,7 +47,7 @@ export function HonestyPage() {
       {/* HERO — Hearth */}
       <Section tone="hearth">
         <div className="kw-fade">
-          <Eyebrow ember>Validated on real DE-LU prices</Eyebrow>
+          <Eyebrow ember>Validated on real German power prices</Eyebrow>
         </div>
         <div className="kw-fade kw-fade--2" style={{ marginTop: 28 }}>
           <Couplet
@@ -58,18 +58,20 @@ export function HonestyPage() {
           />
         </div>
         <p className="kw-lead kw-fade kw-fade--3" style={{ marginTop: 28 }}>
-          A perfect-foresight battery on German day-ahead prices captured{" "}
+          A battery earns by buying power when it's cheap and selling when it's
+          dear; the gap it keeps is the spread. Even one that could see a whole
+          day's prices in advance captured only{" "}
           <DataMono tone="ember">{eurPerMwh(ceilMin)}</DataMono>–
-          <DataMono tone="ember">{eurPerMwh(ceilMax)}</DataMono> per MWh every year from{" "}
-          {YEARS[0]} to {latest} — always under the €80 the deck assumed. A causal strategy
-          with no foresight captures less still. This page separates what is validated from
-          what is only an estimate, and names what is still in diligence.
+          <DataMono tone="ember">{eurPerMwh(ceilMax)}</DataMono> per MWh — every
+          year, {YEARS[0]} to {latest}. Always under the €80 the business plan
+          assumed. A real battery, blind to tomorrow, keeps less. Below: what
+          we've proven, what's still an estimate, and what we're still checking.
         </p>
         <div className="kw-hero__meta kw-fade kw-fade--3">
-          <Stat label="Validated best-case" value={`${eurPerMwh(ceilMin)}–${eurPerMwh(ceilMax)}`} ember />
-          <Stat label="Years backtested" value={String(YEARS.length)} />
-          <Stat label="Realistic vs best-case" value={`${capLo}–${capHi}%`} />
-          <Stat label="Simultaneity" value="0" />
+          <Stat label="Best case captured" value={`${eurPerMwh(ceilMin)}–${eurPerMwh(ceilMax)}`} ember />
+          <Stat label="Price history" value={`${YEARS[0]}–${latest}`} />
+          <Stat label="Realistic vs best case" value={`${capLo}–${capHi}%`} />
+          <Stat label="Days backtested" value={(YEARS.length * 365).toLocaleString()} />
         </div>
       </Section>
 
@@ -82,18 +84,20 @@ export function HonestyPage() {
           size="lg"
         />
         <p className="kw-lead" style={{ marginTop: 20, marginBottom: 36 }}>
-          The best-case is the most a battery could earn with perfect information — an upper
-          bound, validated to the decimal on real prices. The realistic case is a backtested
-          estimate; the conservative case adds the grid fee owed if the §118(6) exemption is
-          lost. IRR and payback stay blank until two diligence items land.
+          Best case is the most a battery could earn if it knew every price in
+          advance — a ceiling no real operator can beat, checked to the cent on
+          real prices. Realistic is what a normal operator could actually earn.
+          Conservative subtracts a grid fee we may owe if a tax exemption is lost.
+          We leave the headline return and payback blank until two open questions
+          close.
         </p>
         <div style={{ overflowX: "auto" }}>
           <CaseTable year={latest} />
         </div>
         <p className="kw-lead" style={{ marginTop: 24, fontSize: "0.92rem", opacity: 0.8 }}>
-          The deck claimed{" "}
-          <DataMono tone="muted">{euro(9947)}</DataMono> gross a year. Reconciled from the same
-          identity — spread × usable MWh × cycles × days — the €80 assumption is worth{" "}
+          The business plan claimed{" "}
+          <DataMono tone="muted">{euro(9947)}</DataMono> a year. Run through the same
+          formula — spread × energy × cycles × days — the €80 assumption is really worth{" "}
           <DataMono tone="muted">{euro(results.assumptions.business_plan.assumed_gross_eur)}</DataMono>
           , not €9,947.
         </p>
@@ -109,10 +113,10 @@ export function HonestyPage() {
         />
         <div className="kw-split kw-split--chart" style={{ marginTop: 44 }}>
           <p className="kw-lead">
-            Day-ahead spreads widened from {YEARS[0]} to {latest} as the system absorbed more
-            renewables and more negative-price hours. Even so, the best-case scenario
-            never reached the assumed €80 — and a real operator, blind to the day ahead,
-            captured only {capLo}–{capHi}% of that best case.
+            The spread widened from {YEARS[0]} to {latest} as the grid took on more
+            renewables and more hours of negative prices. Even so, the best case
+            never reached the assumed €80 — and a real operator, blind to the day
+            ahead, captured only {capLo}–{capHi}% of it.
           </p>
           <SpreadChart />
         </div>
@@ -120,7 +124,7 @@ export function HonestyPage() {
 
       {/* DILIGENCE — Bone */}
       <Section tone="bone">
-        <Eyebrow>Still in diligence</Eyebrow>
+        <Eyebrow>Still checking</Eyebrow>
         <Couplet
           first="Two questions remain open."
           second="We are not hiding them."
@@ -129,30 +133,29 @@ export function HonestyPage() {
         <ul className="kw-diligence__list" style={{ marginTop: 32 }}>
           <Diligence
             tag="#8"
-            title="Aggregator term sheet"
-            body="The BKV fee basis — turnover or net margin — and the revenue share come from a real aggregator term sheet, not code. The three fee bases are implemented and tested; the actual one is pending."
+            title="How the trading partner is paid"
+            body="A licensed partner sells our power on the market and takes a fee. Whether that fee comes off revenue or off profit — and how we split the rest — is set by a signed contract, not by us. We've built all three fee variants; the real one is pending."
           />
           <Diligence
             tag="#9"
-            title="§118(6) EnWG legal memo"
-            body={`Whether the grid-fee exemption is retained or lost is a legal question. The conservative case applies a provisional €${results.assumptions.fees.grid_energy_fee_eur_mwh_charge || 30}/MWh charge on energy drawn, pending the memo.`}
+            title="The grid-fee waiver (§118(6))"
+            body={`German law can waive a grid fee for storage. Whether we keep that waiver is a legal question — until a lawyer confirms it, the conservative case assumes we lose it and adds a €${results.assumptions.fees.grid_energy_fee_eur_mwh_charge || 30}/MWh charge on the power we draw.`}
           />
         </ul>
         <p className="kw-lead" style={{ marginTop: 28, fontSize: "0.92rem", opacity: 0.82 }}>
-          Until both land, project IRR and payback remain blank — a constant-EBITDA
-          placeholder is not a return.
+          Until both close, we leave the return and payback blank. A flat profit
+          guess is not a real return.
         </p>
       </Section>
 
       <footer className="kw-footer">
         <Eyebrow>How this works</Eyebrow>
         <p style={{ marginTop: 14 }}>
-          Every number on this page comes from running an optimisation solver
-          (HiGHS — open-source, industry-standard) on real {p.price_zone} day-ahead
-          electricity prices from {p.data_source}, {p.years.join(" / ")}. The solver
-          finds the profit-maximising charge/discharge schedule for each day given
-          the battery's specs. Best-case assumes perfect knowledge of that day's
-          prices. Realistic uses only past data.
+          Every number here comes from running a solver (HiGHS — free,
+          industry-standard) on real {p.price_zone} day-ahead prices from{" "}
+          {p.data_source}, {p.years.join(" / ")}. For each day it finds the
+          charge-and-sell schedule that earns the most. Best case assumes it knew
+          that day's prices in advance; realistic uses only past data.
         </p>
       </footer>
     </main>

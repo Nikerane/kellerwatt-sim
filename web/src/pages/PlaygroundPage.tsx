@@ -23,6 +23,7 @@ const SLIDERS: SliderDef[] = [
     step: 50,
     default: 200,
     unit: "kWh",
+    hint: "how much energy it stores",
   },
   {
     key: "power_kw",
@@ -32,6 +33,7 @@ const SLIDERS: SliderDef[] = [
     step: 50,
     default: 50,
     unit: "kW",
+    hint: "how fast it charges or sells",
   },
   {
     key: "rte",
@@ -42,6 +44,7 @@ const SLIDERS: SliderDef[] = [
     default: 0.90,
     unit: "%",
     formatValue: (v: number) => `${Math.round(v * 100)}%`,
+    hint: "energy kept after a charge + discharge",
   },
   {
     key: "assumed_spread",
@@ -51,6 +54,7 @@ const SLIDERS: SliderDef[] = [
     step: 5,
     default: 80,
     unit: "€/MWh",
+    hint: "the price gap the plan assumes",
   },
   {
     key: "cycles_per_day",
@@ -60,6 +64,7 @@ const SLIDERS: SliderDef[] = [
     step: 0.5,
     default: 1.5,
     unit: "cyc/day",
+    hint: "full charge-and-empty cycles a day",
   },
   {
     key: "grid_fee",
@@ -69,6 +74,7 @@ const SLIDERS: SliderDef[] = [
     step: 5,
     default: 0,
     unit: "€/MWh",
+    hint: "extra cost per MWh drawn",
   },
 ];
 
@@ -216,9 +222,8 @@ export function PlaygroundPage() {
             />
           </div>
           <p className="kw-lead kw-fade kw-fade--3" style={{ marginTop: 28 }}>
-            Tweak the sliders, then hit Compute. HiGHS — an open-source
-            optimisation solver — finds the best charge/discharge schedule against
-            real DE-LU day-ahead prices.
+            Move the sliders, then hit Compute. The engine re-runs against real
+            German day-ahead prices and finds the best charge-and-sell schedule.
           </p>
         </div>
       </section>
@@ -261,7 +266,7 @@ export function PlaygroundPage() {
                   color: "var(--slate)",
                 }}
               >
-                §118(6) exemption
+                Grid-fee waiver (§118(6))
               </span>
               <span style={{ display: "flex", gap: 8 }}>
                 <button
@@ -307,10 +312,10 @@ export function PlaygroundPage() {
           />
           <div className="kw-split kw-split--chart" style={{ marginTop: 44 }}>
             <p className="kw-lead">
-              The chart shows implied spreads — the price difference the battery
-              captures per megawatt-hour discharged. Best-case assumes perfect
-              knowledge of that day's prices. Realistic uses only past data.
-              Hit Compute after changing the sliders to see the curves shift.
+              The lines show the spread each year — the price gap the battery
+              captures per MWh. Best case assumes it knew that day's prices;
+              realistic uses only past data. Hit Compute after moving the sliders
+              to see the curves shift.
             </p>
             <PlaygroundChart data={response} />
           </div>
@@ -320,10 +325,10 @@ export function PlaygroundPage() {
       <footer className="kw-footer">
         <Eyebrow>How this works</Eyebrow>
         <p style={{ marginTop: 14 }}>
-          HiGHS — an open-source optimisation solver — reads real DE-LU day-ahead
-          prices from Energy-Charts and finds the best possible charge/discharge
-          schedule for each day. Best-case assumes perfect knowledge of that day's
-          prices. Realistic uses only past data, like a real operator would.
+          HiGHS — a free, industry-standard solver — reads real German day-ahead
+          prices from Energy-Charts and finds the best charge-and-sell schedule
+          for each day. Best case assumes it knew that day's prices in advance;
+          realistic uses only past data, like a real operator would.
         </p>
       </footer>
     </main>

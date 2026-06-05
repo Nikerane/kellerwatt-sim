@@ -38,7 +38,7 @@ export function PlaygroundResults({ data, year }: Props) {
     {
       key: "ceiling",
       title: "Best-case",
-      sub: "perfect info",
+      sub: "sees the future",
       tone: "ember",
       spread: ceil?.spread_eur_mwh ?? null,
       annual: ceil?.gross_eur ?? null,
@@ -47,7 +47,7 @@ export function PlaygroundResults({ data, year }: Props) {
     {
       key: "causal-retained",
       title: "Realistic",
-      sub: "exemption retained",
+      sub: "waiver kept",
       tone: "neutral",
       spread: causalR?.spread_eur_mwh ?? null,
       annual: causalR?.gross_eur ?? null,
@@ -56,7 +56,7 @@ export function PlaygroundResults({ data, year }: Props) {
     {
       key: "causal-lost",
       title: "Conservative",
-      sub: "exemption lost",
+      sub: "waiver lost",
       tone: "neutral",
       spread: causalL?.spread_eur_mwh ?? null,
       annual: causalL?.gross_eur ?? null,
@@ -87,7 +87,7 @@ export function PlaygroundResults({ data, year }: Props) {
         <tr>
           <th scope="row">
             Implied spread
-            <span className="kw-table__row-note">€ / MWh discharged</span>
+            <span className="kw-table__row-note">price gap per MWh</span>
           </th>
           {cols.map((c) => (
             <td key={c.key} className={valCls(c)}>
@@ -100,7 +100,7 @@ export function PlaygroundResults({ data, year }: Props) {
         <tr>
           <th scope="row">
             Annual figure
-            <span className="kw-table__row-note">gross / net per year</span>
+            <span className="kw-table__row-note">euros per year</span>
           </th>
           {cols.map((c) => (
             <td key={c.key} className={valCls(c)}>
@@ -113,7 +113,7 @@ export function PlaygroundResults({ data, year }: Props) {
         <tr>
           <th scope="row">
             Cycles / day
-            <span className="kw-table__row-note">AC delivered</span>
+            <span className="kw-table__row-note">full cycles</span>
           </th>
           {cols.map((c) => (
             <td key={c.key} className={valCls(c)}>
