@@ -317,64 +317,16 @@ export function PlaygroundPage() {
         </div>
       </section>
 
-      <section className="kw-section kw-section--bone kw-section--tight">
-        <div className="kw-section__inner">
-          <Eyebrow>How the parameters work</Eyebrow>
-          <p className="kw-lead" style={{ marginTop: 18, marginBottom: 24 }}>
-            Each slider changes a single input. Behind it, HiGHS — an open-source
-            optimisation solver — reads real DE-LU day-ahead prices and finds the
-            best possible charge/discharge schedule for each day.
-          </p>
-
-          <div style={{ display: "grid", gap: 16 }}>
-            <ParameterExplain
-              label="Battery capacity"
-              detail="How much energy the battery can store (kWh). A larger battery captures more value per cycle but costs more upfront."
-            />
-            <ParameterExplain
-              label="Power rating"
-              detail="How fast the battery can charge and discharge (kW). Higher power captures shorter, sharper price spikes."
-            />
-            <ParameterExplain
-              label="Round-trip efficiency"
-              detail="Energy retained in the charge/discharge cycle. 90% means 10 kWh in = 9 kWh out. Higher is better."
-            />
-            <ParameterExplain
-              label="Assumed spread"
-              detail="The price difference (€/MWh) the business plan assumes, used as a sanity check against what the market actually paid."
-            />
-            <ParameterExplain
-              label="Daily cycle cap"
-              detail="How many full cycles per day the model assumes. More cycling = more revenue but faster degradation."
-            />
-            <ParameterExplain
-              label="Grid energy fee"
-              detail="The €/MWh charge on energy drawn from the grid if the §118(6) exemption is lost. Only affects the conservative case."
-            />
-            <ParameterExplain
-              label="§118(6) exemption"
-              detail="A German grid-fee exemption for storage. Retained — only energy losses pay fees. Lost — all drawn energy is charged."
-            />
-          </div>
-        </div>
-      </section>
+      <footer className="kw-footer">
+        <Eyebrow>How this works</Eyebrow>
+        <p style={{ marginTop: 14 }}>
+          HiGHS — an open-source optimisation solver — reads real DE-LU day-ahead
+          prices from Energy-Charts and finds the best possible charge/discharge
+          schedule for each day. Best-case assumes perfect knowledge of tomorrow's
+          prices. Realistic uses only past data, like a real operator would.
+        </p>
+      </footer>
     </main>
-  );
-}
-
-function ParameterExplain({ label, detail }: { label: string; detail: string }) {
-  return (
-    <div style={{
-      background: "var(--paper)", padding: "14px 18px",
-      borderRadius: "var(--r-12)", border: "var(--hairline)",
-    }}>
-      <strong style={{ fontFamily: "var(--serif)", fontWeight: 500, fontSize: "1.0rem" }}>
-        {label}
-      </strong>
-      <p style={{ margin: "4px 0 0", opacity: 0.72, fontSize: "0.9rem", lineHeight: 1.5 }}>
-        {detail}
-      </p>
-    </div>
   );
 }
 
