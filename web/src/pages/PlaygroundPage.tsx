@@ -297,9 +297,23 @@ export function PlaygroundPage() {
       </section>
 
       {/* Chart */}
-      <section className="kw-section kw-section--hearth kw-section--tight">
+      <section className="kw-section kw-section--hearth">
         <div className="kw-section__inner">
-          <PlaygroundChart data={response} />
+          <Eyebrow>The spread, by year</Eyebrow>
+          <Couplet
+            first="The best case is what's possible."
+            second="The realistic case is what's likely."
+            size="lg"
+          />
+          <div className="kw-split kw-split--chart" style={{ marginTop: 44 }}>
+            <p className="kw-lead">
+              The chart shows implied spreads — the price difference the battery
+              captures per megawatt-hour discharged. Best-case assumes perfect
+              knowledge of tomorrow's prices. Realistic uses only past data.
+              Hit Compute after changing the sliders to see the curves shift.
+            </p>
+            <PlaygroundChart data={response} />
+          </div>
         </div>
       </section>
 
