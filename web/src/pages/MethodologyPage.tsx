@@ -2,20 +2,16 @@ import { SiteNav } from "../components/SiteNav";
 import { Eyebrow } from "../components/Eyebrow";
 import { Couplet } from "../components/Couplet";
 import { DataMono } from "../components/DataMono";
-import { results, YEARS, strategy } from "../data/load";
+import { results, YEARS } from "../data/load";
 
 export function MethodologyPage() {
   const bp = results.assumptions.business_plan;
   const battery = results.assumptions.battery;
   const latest = Math.max(...YEARS);
-  const ceilStrat = strategy("lp_ceiling");
-
   // Derive the identity: spread × usable MWh × cycles × days = annual gross
   const cyclesPerDay = bp.assumed_cycles_per_day;
   const days = 365;
   const usable = battery.usable_kwh;
-  const mwhPerYear = (usable * cyclesPerDay * days) / 1000;
-  const implied = bp.assumed_gross_eur / mwhPerYear;
 
   return (
     <main className="kw-page">

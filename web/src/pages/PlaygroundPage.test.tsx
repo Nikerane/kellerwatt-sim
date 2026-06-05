@@ -77,4 +77,3 @@ describe("PlaygroundPage", () => {
     ).toBeInTheDocument();
   });
 });
-});
