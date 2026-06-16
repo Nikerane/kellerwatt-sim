@@ -3,7 +3,7 @@
 export function SiteNav({ current }: { current: "honesty" | "methodology" | "playground" }) {
   return (
     <nav className="kw-nav" aria-label="Primary">
-      <a className="kw-nav__brand" href="https://nikerane.github.io/kellerwatt/index.html">KellerWatt</a>
+      <a className="kw-nav__brand" href="https://kellerwatt.de">KellerWatt</a>
       <span className="kw-nav__links">
         <a aria-current={current === "honesty" ? "page" : undefined} href="https://nikerane.github.io/kellerwatt-sim/index.html">
           Validation
